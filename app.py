@@ -1,4 +1,4 @@
-```python
+
 import streamlit as st
 
 # ============================================================
@@ -881,4 +881,4 @@ CEP Project — Smartphone Usage & Online Safety for Women<br>
 Learn • Protect • Stay Connected
 </div>
 """, unsafe_allow_html=True)
-```
+
