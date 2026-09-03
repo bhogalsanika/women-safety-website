@@ -1,3 +1,4 @@
+```python
 import streamlit as st
 
 # ============================================================
@@ -858,3 +859,26 @@ elif page == "💻 Report Cyber Crime":
     st.subheader("📝 If You Become a Victim")
 
     st.markdown("""
+    1. Stay calm.
+    2. Do not delete important evidence.
+    3. Take screenshots where appropriate.
+    4. Contact your bank immediately for financial fraud.
+    5. Contact 1930 for cyber financial fraud.
+    6. Use the official cybercrime reporting portal.
+    """)
+
+
+# ============================================================
+# FOOTER
+# ============================================================
+
+st.divider()
+
+st.markdown("""
+<div class="footer">
+🌸 <b>Digital Saheli</b><br>
+CEP Project — Smartphone Usage & Online Safety for Women<br>
+Learn • Protect • Stay Connected
+</div>
+""", unsafe_allow_html=True)
+```
