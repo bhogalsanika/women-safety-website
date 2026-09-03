@@ -1,847 +1,686 @@
 import streamlit as st
 
-# =========================================================
+# ============================================================
 # PAGE CONFIG
-# =========================================================
+# ============================================================
 
 st.set_page_config(
-    page_title="Women Digital Safety",
+    page_title="Women Digital Help",
     page_icon="📱",
-    layout="wide",
-    initial_sidebar_state="collapsed"
+    layout="wide"
 )
 
-# =========================================================
+# ============================================================
 # CSS
-# =========================================================
+# ============================================================
 
 st.markdown("""
 <style>
 
-#MainMenu {visibility:hidden;}
-footer {visibility:hidden;}
-header {visibility:hidden;}
-
-.stApp {
-    background: #f8f9fc;
+.main {
+    background-color: #f7f8fc;
 }
 
-.block-container {
-    max-width: 1100px;
-    padding-top: 2rem;
-}
-
-/* Logo */
-.logo {
+.hero {
     text-align: center;
-    font-size: 42px;
-    font-weight: 800;
-    margin-top: 35px;
+    padding: 45px 20px 25px 20px;
 }
 
-.tagline {
-    text-align: center;
+.hero h1 {
+    font-size: 46px;
+    margin-bottom: 5px;
+}
+
+.hero p {
+    font-size: 20px;
     color: #666;
-    font-size: 18px;
-    margin-bottom: 35px;
 }
 
-/* Search */
-.search-area {
+.search-box {
     background: white;
-    padding: 10px 20px;
-    border-radius: 40px;
-    box-shadow: 0 5px 25px rgba(0,0,0,.10);
+    padding: 20px;
+    border-radius: 18px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
     margin-bottom: 30px;
 }
 
-/* Cards */
 .card {
     background: white;
-    padding: 25px;
-    border-radius: 20px;
-    box-shadow: 0 4px 18px rgba(0,0,0,.07);
-    min-height: 150px;
+    padding: 22px;
+    border-radius: 16px;
+    margin-bottom: 15px;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.06);
 }
 
-.card-title {
-    font-size: 21px;
-    font-weight: 700;
+.card h3 {
+    margin-top: 0;
 }
 
-.card-text {
-    color: #666;
-    margin-top: 7px;
-}
-
-/* Phone */
-.phone {
-    background: #111;
-    border-radius: 30px;
+.step {
+    background: #f1f3f8;
     padding: 15px;
-    max-width: 350px;
-    margin: auto;
+    border-radius: 12px;
+    margin: 8px 0;
 }
 
-.phone-screen {
-    background: white;
-    border-radius: 20px;
-    padding: 20px;
-    min-height: 430px;
-}
-
-.chat {
-    background: #e8f5e9;
-    padding: 12px;
-    border-radius: 15px;
-    margin: 10px 0;
-}
-
-/* Scam */
-.scam {
-    background: #fff3f3;
-    border: 1px solid #ffbaba;
-    padding: 18px;
-    border-radius: 15px;
-}
-
-/* Result */
-.success-box {
-    padding: 18px;
+.correct {
+    padding: 15px;
+    border-radius: 12px;
     background: #e8f7ee;
-    border-radius: 15px;
 }
 
-.warning-box {
-    padding: 18px;
-    background: #fff4dd;
-    border-radius: 15px;
-}
-
-.footer {
-    text-align: center;
-    color: #777;
-    padding: 30px;
+.wrong {
+    padding: 15px;
+    border-radius: 12px;
+    background: #fdeaea;
 }
 
 </style>
 """, unsafe_allow_html=True)
 
 
-# =========================================================
-# SESSION STATE
-# =========================================================
+# ============================================================
+# TOP HERO
+# ============================================================
 
-if "page" not in st.session_state:
-    st.session_state.page = "home"
-
-if "score" not in st.session_state:
-    st.session_state.score = 0
-
-
-# =========================================================
-# NAVIGATION
-# =========================================================
-
-def go(page):
-    st.session_state.page = page
-    st.rerun()
+st.markdown("""
+<div class="hero">
+    <h1>📱 Women Digital Help</h1>
+    <p>Learn smartphone usage • Practice online safety • Stay confident</p>
+</div>
+""", unsafe_allow_html=True)
 
 
-# =========================================================
-# HOME
-# =========================================================
+# ============================================================
+# SEARCH
+# ============================================================
 
-def home():
+st.markdown('<div class="search-box">', unsafe_allow_html=True)
 
-    st.markdown(
-        '<div class="logo">📱 Women Digital Safety</div>',
-        unsafe_allow_html=True
-    )
+search = st.text_input(
+    "🔍 What do you want to learn?",
+    placeholder="Example: WhatsApp, UPI, OTP, Camera, Password..."
+)
 
-    st.markdown(
-        '<div class="tagline">'
-        'Learn Smart. Stay Safe. Use Technology with Confidence.'
-        '</div>',
-        unsafe_allow_html=True
-    )
+st.markdown("</div>", unsafe_allow_html=True)
 
-    # ---------------- SEARCH ----------------
 
-    st.markdown('<div class="search-area">', unsafe_allow_html=True)
+# ============================================================
+# TOPICS
+# ============================================================
 
-    search = st.text_input(
-        "Search",
-        placeholder="Search: WhatsApp, UPI, OTP, Camera, Scam, Password...",
-        label_visibility="collapsed"
-    )
+topics = {
+    "📱 WhatsApp": "whatsapp",
+    "💳 UPI Payment": "upi",
+    "📸 Camera": "camera",
+    "🌐 Internet": "internet",
+    "📲 Install App": "apps",
+    "🔐 Phone Lock": "lock",
+    "📍 Location": "location",
+    "🛡️ Online Safety": "safety"
+}
 
-    st.markdown('</div>', unsafe_allow_html=True)
 
-    # ---------------- SEARCH RESULTS ----------------
+# ============================================================
+# SEARCH LOGIC
+# ============================================================
 
-    if search:
+selected_topic = None
 
-        q = search.lower()
+if search:
 
-        st.subheader("🔎 Search Results")
+    search_text = search.lower()
 
-        results = []
+    if "whatsapp" in search_text:
+        selected_topic = "whatsapp"
 
-        if "whatsapp" in q:
-            results.append(
-                ("💬 WhatsApp Practice",
-                 "Practice messages and learn WhatsApp safety.",
-                 "whatsapp")
-            )
+    elif "upi" in search_text or "payment" in search_text:
+        selected_topic = "upi"
 
-        if "upi" in q or "payment" in q:
-            results.append(
-                ("💳 UPI Safety Practice",
-                 "Practice safe digital payment situations.",
-                 "upi")
-            )
+    elif "camera" in search_text or "photo" in search_text:
+        selected_topic = "camera"
 
-        if "otp" in q:
-            results.append(
-                ("🔐 OTP Safety",
-                 "Learn what to do when someone asks for your OTP.",
-                 "otp")
-            )
+    elif "internet" in search_text or "google" in search_text:
+        selected_topic = "internet"
 
-        if "scam" in q or "fraud" in q:
-            results.append(
-                ("🚨 Scam Detective",
-                 "Find warning signs in suspicious messages.",
-                 "scam")
-            )
+    elif "app" in search_text or "install" in search_text:
+        selected_topic = "apps"
 
-        if "camera" in q or "photo" in q:
-            results.append(
-                ("📸 Camera Learning",
-                 "Learn camera use and photo safety.",
-                 "camera")
-            )
+    elif "lock" in search_text or "password" in search_text:
+        selected_topic = "lock"
 
-        if "password" in q or "lock" in q:
-            results.append(
-                ("🔒 Phone Security",
-                 "Practice choosing a safer phone password.",
-                 "password")
-            )
+    elif "location" in search_text:
+        selected_topic = "location"
 
-        if "internet" in q or "google" in q:
-            results.append(
-                ("🌐 Internet Practice",
-                 "Learn safer internet searching.",
-                 "internet")
-            )
+    elif (
+        "safety" in search_text
+        or "otp" in search_text
+        or "fraud" in search_text
+        or "scam" in search_text
+    ):
+        selected_topic = "safety"
 
-        if results:
+    else:
+        st.warning(
+            "Sorry, this topic is not available yet. "
+            "Try WhatsApp, UPI, Camera, Internet, Apps, Password or Safety."
+        )
 
-            for title, description, page in results:
 
-                st.markdown(
-                    f"""
-                    <div class="card">
-                    <div class="card-title">{title}</div>
-                    <div class="card-text">{description}</div>
-                    </div>
-                    """,
-                    unsafe_allow_html=True
-                )
+# ============================================================
+# QUICK TOPIC BUTTONS
+# ============================================================
 
-                if st.button(
-                    "Open →",
-                    key=f"search_{page}",
-                    use_container_width=True
-                ):
-                    go(page)
+if not selected_topic:
 
-        else:
+    st.subheader("✨ What would you like to learn?")
 
-            st.info(
-                "No result found. Try WhatsApp, UPI, OTP, "
-                "Scam, Camera, Password or Internet."
-            )
+    col1, col2, col3, col4 = st.columns(4)
 
-        return
+    buttons = list(topics.items())
 
-    # =====================================================
-    # LEARN & PRACTICE
-    # =====================================================
+    for i, (name, value) in enumerate(buttons):
 
-    st.subheader("✨ Learn & Practice")
+        with [col1, col2, col3, col4][i % 4]:
 
-    col1, col2, col3 = st.columns(3)
+            if st.button(name, use_container_width=True):
+                st.session_state["topic"] = value
+                st.rerun()
 
-    # WhatsApp
-    with col1:
 
-        st.markdown("""
-        <div class="card">
-        <div class="card-title">💬 WhatsApp</div>
-        <div class="card-text">
-        Practice messages and identify unsafe chats.
-        </div>
-        </div>
-        """, unsafe_allow_html=True)
+# Get topic from session
 
-        if st.button(
-            "Practice WhatsApp",
-            use_container_width=True
-        ):
-            go("whatsapp")
+if "topic" in st.session_state and not selected_topic:
+    selected_topic = st.session_state["topic"]
 
-    # UPI
-    with col2:
 
-        st.markdown("""
-        <div class="card">
-        <div class="card-title">💳 UPI</div>
-        <div class="card-text">
-        Learn safe digital payments through situations.
-        </div>
-        </div>
-        """, unsafe_allow_html=True)
+# ============================================================
+# WHATSAPP
+# ============================================================
 
-        if st.button(
-            "Practice UPI",
-            use_container_width=True
-        ):
-            go("upi")
+if selected_topic == "whatsapp":
 
-    # Scam
-    with col3:
-
-        st.markdown("""
-        <div class="card">
-        <div class="card-title">🚨 Scam Detective</div>
-        <div class="card-text">
-        Can you identify a suspicious message?
-        </div>
-        </div>
-        """, unsafe_allow_html=True)
-
-        if st.button(
-            "Start Challenge",
-            use_container_width=True
-        ):
-            go("scam")
-
-    st.write("")
-
-    col4, col5, col6 = st.columns(3)
-
-    # Camera
-    with col4:
-
-        st.markdown("""
-        <div class="card">
-        <div class="card-title">📸 Camera</div>
-        <div class="card-text">
-        Learn camera use and protect private photos.
-        </div>
-        </div>
-        """, unsafe_allow_html=True)
-
-        if st.button(
-            "Learn Camera",
-            use_container_width=True
-        ):
-            go("camera")
-
-    # Password
-    with col5:
-
-        st.markdown("""
-        <div class="card">
-        <div class="card-title">🔐 Phone Security</div>
-        <div class="card-text">
-        Practice choosing a strong phone lock.
-        </div>
-        </div>
-        """, unsafe_allow_html=True)
-
-        if st.button(
-            "Secure Phone",
-            use_container_width=True
-        ):
-            go("password")
-
-    # Internet
-    with col6:
-
-        st.markdown("""
-        <div class="card">
-        <div class="card-title">🌐 Internet</div>
-        <div class="card-text">
-        Practice searching online safely.
-        </div>
-        </div>
-        """, unsafe_allow_html=True)
-
-        if st.button(
-            "Practice Internet",
-            use_container_width=True
-        ):
-            go("internet")
-
-    # =====================================================
-    # PROGRESS
-    # =====================================================
-
-    st.divider()
-
-    st.subheader("🏆 My Learning Progress")
-
-    progress = min(st.session_state.score / 10, 1.0)
-
-    st.progress(progress)
+    st.title("📱 Learn WhatsApp")
 
     st.write(
-        f"Completed safety practices: "
-        f"**{st.session_state.score}**"
+        "Learn basic WhatsApp features and how to stay safe while using them."
     )
 
-    st.markdown(
-        '<div class="footer">'
-        'Women Digital Safety • Community Engagement Project'
-        '</div>',
-        unsafe_allow_html=True
+    option = st.radio(
+        "What do you want to learn?",
+        [
+            "Send a Message",
+            "Send a Photo",
+            "Voice Call",
+            "WhatsApp Safety"
+        ]
     )
 
+    if option == "Send a Message":
 
-# =========================================================
-# WHATSAPP
-# =========================================================
+        st.subheader("💬 How to send a WhatsApp message")
 
-def whatsapp():
+        steps = [
+            "Open WhatsApp.",
+            "Select the person you want to message.",
+            "Tap the message box.",
+            "Type your message.",
+            "Press the Send button."
+        ]
 
-    st.title("💬 WhatsApp Safety Practice")
+        for i, step in enumerate(steps, 1):
+            st.markdown(
+                f'<div class="step">Step {i}️⃣ — {step}</div>',
+                unsafe_allow_html=True
+            )
 
-    st.caption(
-        "This is a simulated conversation for learning purposes."
+        if st.button("✅ I understood"):
+            st.success("Great! You learned how to send a message.")
+
+    elif option == "Send a Photo":
+
+        st.subheader("📸 How to send a photo")
+
+        steps = [
+            "Open the WhatsApp chat.",
+            "Tap the attachment/camera option.",
+            "Choose a photo.",
+            "Check the selected photo.",
+            "Tap Send."
+        ]
+
+        for i, step in enumerate(steps, 1):
+            st.markdown(
+                f'<div class="step">Step {i}️⃣ — {step}</div>',
+                unsafe_allow_html=True
+            )
+
+        if st.button("📸 Practice Complete"):
+            st.success("Excellent! You know how to send a photo.")
+
+    elif option == "Voice Call":
+
+        st.subheader("📞 WhatsApp Voice Call")
+
+        st.write("To make a voice call:")
+
+        st.markdown("""
+        <div class="step">1️⃣ Open the WhatsApp chat.</div>
+        <div class="step">2️⃣ Tap the phone icon.</div>
+        <div class="step">3️⃣ Wait for the person to answer.</div>
+        """, unsafe_allow_html=True)
+
+        st.info(
+            "Safety Tip: Do not share private information with unknown callers."
+        )
+
+    else:
+
+        st.subheader("🛡️ WhatsApp Safety")
+
+        safety = [
+            "Do not share OTP with anyone.",
+            "Do not open suspicious links.",
+            "Do not share private photos with unknown people.",
+            "Check unknown group invitations carefully.",
+            "Use WhatsApp privacy settings."
+        ]
+
+        for item in safety:
+            st.checkbox(item)
+
+        if st.button("🔎 Check My Safety"):
+            st.success("Good! Review any unchecked safety points.")
+
+
+# ============================================================
+# UPI
+# ============================================================
+
+elif selected_topic == "upi":
+
+    st.title("💳 UPI Payment Practice")
+
+    st.write(
+        "Practice common UPI situations and learn what is safe."
     )
 
-    st.markdown("""
-    <div class="phone">
+    st.subheader("Scenario 1")
 
-        <div class="phone-screen">
-
-        <h3>WhatsApp</h3>
-
-        <hr>
-
-        <div class="chat">
-        👩 Friend: Hi! How are you?
-        </div>
-
-        <div class="chat">
-        👤 Unknown: Congratulations! 🎉
-        You won ₹25,000.
-        </div>
-
-        <div class="chat">
-        👤 Unknown: Send me the OTP to receive your money.
-        </div>
-
-        </div>
-
-    </div>
-    """, unsafe_allow_html=True)
-
-    st.write("")
+    st.info(
+        "A person says: 'I am sending you money. "
+        "Please enter your UPI PIN to receive it.'"
+    )
 
     answer = st.radio(
         "What should you do?",
         [
-            "Send the OTP",
-            "Ignore the request and do not share OTP"
-        ]
+            "Enter my UPI PIN",
+            "Do not enter PIN and verify the transaction"
+        ],
+        key="upi1"
     )
 
-    if st.button("🔎 Check My Decision"):
+    if st.button("Check Answer", key="checkupi"):
 
-        if answer == "Ignore the request and do not share OTP":
-
-            st.session_state.score += 1
+        if answer == "Do not enter PIN and verify the transaction":
 
             st.success(
-                "✅ Correct! Never share an OTP with another person."
+                "✅ Correct! Your UPI PIN is used to authorize payments. "
+                "Never share it with anyone."
             )
 
         else:
 
             st.error(
-                "❌ Unsafe choice. OTPs should remain private."
+                "❌ Not safe. Never share your UPI PIN with another person."
             )
 
-    if st.button("← Back to Home"):
-        go("home")
+    st.divider()
 
-
-# =========================================================
-# UPI
-# =========================================================
-
-def upi():
-
-    st.title("💳 UPI Safety Simulator")
-
-    st.write(
-        "Imagine you received this payment request."
-    )
-
-    st.markdown("""
-    <div class="card">
-
-    <h3>💰 Payment Request</h3>
-
-    <b>Person:</b> Unknown Seller
-
-    <br><br>
-
-    "Scan this QR code and enter your UPI PIN.
-    You will receive ₹5,000."
-
-    </div>
-    """, unsafe_allow_html=True)
-
-    choice = st.radio(
-        "What will you do?",
-        [
-            "Scan and enter my UPI PIN",
-            "Verify the transaction first"
-        ]
-    )
-
-    if st.button("💡 Check Decision"):
-
-        if choice == "Verify the transaction first":
-
-            st.session_state.score += 1
-
-            st.success(
-                "✅ Correct! Verify unexpected payment requests."
-            )
-
-        else:
-
-            st.warning(
-                "⚠️ Never enter your UPI PIN just to receive money."
-            )
-
-    if st.button("← Back to Home"):
-        go("home")
-
-
-# =========================================================
-# OTP
-# =========================================================
-
-def otp():
-
-    st.title("🔐 OTP Safety Challenge")
+    st.subheader("Scenario 2")
 
     st.info(
-        "Someone calls and says: "
-        "\"I am from the bank. Tell me the OTP you received.\""
+        "Someone sends you a QR code and says: "
+        "'Scan this to receive ₹5,000.'"
     )
 
-    answer = st.radio(
-        "What will you do?",
+    qr_answer = st.radio(
+        "What is safer?",
         [
-            "Tell them the OTP",
-            "Do not share the OTP"
-        ]
+            "Scan immediately",
+            "Verify the person and transaction first"
+        ],
+        key="upi2"
     )
 
-    if st.button("Check Answer"):
+    if st.button("Check QR Answer"):
 
-        if answer == "Do not share the OTP":
-
-            st.session_state.score += 1
-
-            st.success(
-                "✅ Correct! OTP should never be shared."
-            )
-
+        if qr_answer == "Verify the person and transaction first":
+            st.success("✅ Correct! Always verify unexpected payment requests.")
         else:
-
-            st.error(
-                "❌ Never share your OTP with another person."
-            )
-
-    if st.button("← Back to Home"):
-        go("home")
+            st.error("❌ Be careful with unknown QR codes.")
 
 
-# =========================================================
-# SCAM DETECTIVE
-# =========================================================
-
-def scam():
-
-    st.title("🚨 Scam Detective")
-
-    st.write(
-        "You are the detective. Find the warning signs."
-    )
-
-    st.markdown("""
-    <div class="scam">
-
-    <b>📩 MESSAGE RECEIVED</b>
-
-    <br><br>
-
-    🎉 Congratulations! You have won ₹50,000!
-
-    <br><br>
-
-    Click this link immediately and pay ₹499
-    to claim your prize.
-
-    <br><br>
-
-    ⚠️ Offer expires in 10 minutes!
-
-    </div>
-    """, unsafe_allow_html=True)
-
-    st.write("")
-
-    suspicious = st.multiselect(
-        "🔎 Select the warning signs",
-        [
-            "Unexpected prize",
-            "Asking for money",
-            "Urgent deadline",
-            "Unknown link"
-        ]
-    )
-
-    if st.button("🕵️ Submit Investigation"):
-
-        if len(suspicious) >= 3:
-
-            st.session_state.score += 1
-
-            st.success(
-                "✅ Excellent! You identified several warning signs."
-            )
-
-        else:
-
-            st.warning(
-                "Look carefully. There are multiple warning signs."
-            )
-
-    if st.button("← Back to Home"):
-        go("home")
-
-
-# =========================================================
+# ============================================================
 # CAMERA
-# =========================================================
+# ============================================================
 
-def camera():
+elif selected_topic == "camera":
 
-    st.title("📸 Camera Learning")
+    st.title("📸 Learn Camera")
 
-    activity = st.selectbox(
+    action = st.selectbox(
         "Choose an activity",
         [
             "Take a Photo",
             "Record a Video",
-            "Protect Private Photos"
+            "Keep Photos Private"
         ]
     )
 
-    if activity == "Take a Photo":
+    if action == "Take a Photo":
 
-        st.subheader("📷 Your Task")
+        st.subheader("📷 Taking a photo")
 
-        answer = st.radio(
-            "Which button normally takes a photo?",
-            [
-                "Capture / Camera button",
-                "Airplane mode",
-                "Volume settings"
-            ]
-        )
+        steps = [
+            "Open the Camera app.",
+            "Point the camera at the subject.",
+            "Tap the capture button.",
+            "Open Gallery to view the photo."
+        ]
 
-        if st.button("Check"):
+        for i, step in enumerate(steps, 1):
+            st.markdown(
+                f'<div class="step">Step {i}️⃣ — {step}</div>',
+                unsafe_allow_html=True
+            )
 
-            if answer == "Capture / Camera button":
+        if st.button("📸 Done"):
+            st.success("Photo lesson completed!")
 
-                st.session_state.score += 1
+    elif action == "Record a Video":
 
-                st.success(
-                    "✅ Correct! That is the camera capture button."
-                )
-
-            else:
-
-                st.error("❌ Try again.")
-
-    elif activity == "Record a Video":
-
-        st.subheader("🎥 Record a Video")
+        st.subheader("🎥 Recording a video")
 
         st.write(
-            "Camera → Video → Record → Stop"
+            "Open Camera → select Video → press Record → "
+            "press Stop when finished."
         )
 
-        if st.button("I Understand"):
-
-            st.session_state.score += 1
-
-            st.success(
-                "✅ Video lesson completed."
-            )
+        st.success("Tip: Keep your phone steady while recording.")
 
     else:
 
-        st.subheader("🔒 Protect Private Photos")
+        st.subheader("🔐 Keep photos private")
 
         st.warning(
-            "Do not share private photos with unknown people. "
-            "Check photo-sharing and app permissions."
+            "Avoid sending private photos to unknown people. "
+            "Review who can access your photos and cloud backups."
         )
 
-        if st.button("Complete Lesson"):
 
-            st.session_state.score += 1
-
-            st.success(
-                "✅ Safety lesson completed."
-            )
-
-    if st.button("← Back to Home"):
-        go("home")
-
-
-# =========================================================
-# PASSWORD
-# =========================================================
-
-def password():
-
-    st.title("🔒 Strong Password Challenge")
-
-    st.write(
-        "Choose the safer password."
-    )
-
-    answer = st.radio(
-        "Select one:",
-        [
-            "123456",
-            "password",
-            "sanika123",
-            "My@Safe2026#Phone"
-        ]
-    )
-
-    if st.button("Check Password"):
-
-        if answer == "My@Safe2026#Phone":
-
-            st.session_state.score += 1
-
-            st.success(
-                "✅ Better choice! Use strong and unique passwords."
-            )
-
-        else:
-
-            st.error(
-                "❌ This password is easier to guess."
-            )
-
-    st.info(
-        "Never share your phone password, UPI PIN or account password."
-    )
-
-    if st.button("← Back to Home"):
-        go("home")
-
-
-# =========================================================
+# ============================================================
 # INTERNET
-# =========================================================
+# ============================================================
 
-def internet():
+elif selected_topic == "internet":
 
-    st.title("🌐 Internet Search Practice")
+    st.title("🌐 Learn Internet Searching")
+
+    st.write("Practice searching for information safely.")
 
     query = st.text_input(
-        "🔍 What would you search?",
+        "What would you search for?",
         placeholder="Example: nearest hospital"
     )
 
-    if query:
+    if st.button("🔍 Search Practice"):
 
-        st.success(
-            f'You searched for: "{query}"'
+        if query:
+            st.success(f'Good! You searched for: "{query}"')
+
+            st.info(
+                "Safety Tip: Check whether the website is trustworthy "
+                "before entering personal information."
+            )
+        else:
+            st.warning("Enter something to search.")
+
+
+# ============================================================
+# INSTALL APP
+# ============================================================
+
+elif selected_topic == "apps":
+
+    st.title("📲 How to Install an App")
+
+    steps = [
+        "Open Google Play Store.",
+        "Search for the required app.",
+        "Check the app name and developer.",
+        "Read reviews and check downloads.",
+        "Tap Install.",
+        "Open the app after installation."
+    ]
+
+    for i, step in enumerate(steps, 1):
+        st.markdown(
+            f'<div class="step">Step {i}️⃣ — {step}</div>',
+            unsafe_allow_html=True
         )
 
-    st.subheader("🔎 Which result is safer?")
+    st.warning(
+        "⚠️ Avoid installing apps from unknown links or websites."
+    )
 
-    choice = st.radio(
-        "Choose one:",
+    if st.button("✅ I learned this"):
+        st.success("Good! You know the basic app installation process.")
+
+
+# ============================================================
+# PHONE LOCK
+# ============================================================
+
+elif selected_topic == "lock":
+
+    st.title("🔐 Protect Your Phone")
+
+    st.write("A phone lock helps protect your personal information.")
+
+    lock_type = st.selectbox(
+        "Choose a protection method",
         [
-            "Official government or organization website",
-            "Unknown website promising free money"
+            "PIN",
+            "Password",
+            "Pattern",
+            "Fingerprint"
         ]
     )
 
-    if st.button("Check Choice"):
+    st.info(
+        f"You selected: {lock_type}. "
+        "Use a method that is difficult for others to guess."
+    )
 
-        if choice == "Official government or organization website":
+    if st.button("🔒 Complete Security Check"):
 
-            st.session_state.score += 1
-
-            st.success(
-                "✅ Correct! Prefer official and trusted sources."
-            )
-
-        else:
-
-            st.error(
-                "❌ Be careful with websites making unrealistic promises."
-            )
-
-    if st.button("← Back to Home"):
-        go("home")
+        st.success(
+            "Remember: Never share your phone password/PIN with strangers."
+        )
 
 
-# =========================================================
-# ROUTER
-# =========================================================
+# ============================================================
+# LOCATION
+# ============================================================
 
-if st.session_state.page == "home":
-    home()
+elif selected_topic == "location":
 
-elif st.session_state.page == "whatsapp":
-    whatsapp()
+    st.title("📍 Location Sharing")
 
-elif st.session_state.page == "upi":
-    upi()
+    st.write(
+        "Location sharing can be useful, but it should be controlled carefully."
+    )
 
-elif st.session_state.page == "otp":
-    otp()
+    choices = [
+        "I check which apps have location permission.",
+        "I avoid sharing my live location with strangers.",
+        "I turn off location when it is not needed.",
+        "I check location settings regularly."
+    ]
 
-elif st.session_state.page == "scam":
-    scam()
+    for choice in choices:
+        st.checkbox(choice)
 
-elif st.session_state.page == "camera":
-    camera()
+    if st.button("📍 Check Location Safety"):
+        st.success(
+            "Good! Review your location permissions regularly."
+        )
 
-elif st.session_state.page == "password":
-    password()
 
-elif st.session_state.page == "internet":
-    internet()
+# ============================================================
+# ONLINE SAFETY
+# ============================================================
+
+elif selected_topic == "safety":
+
+    st.title("🛡️ Online Safety Practice")
+
+    scenario = st.selectbox(
+        "Choose a situation",
+        [
+            "Unknown OTP Request",
+            "Suspicious Link",
+            "Fake Prize Message",
+            "Unknown Friend Request",
+            "Online Harassment"
+        ]
+    )
+
+    if scenario == "Unknown OTP Request":
+
+        st.info(
+            "Someone calls you and asks for the OTP received on your phone."
+        )
+
+        ans = st.radio(
+            "What will you do?",
+            [
+                "Tell them the OTP",
+                "Do not share the OTP"
+            ]
+        )
+
+        if st.button("Check OTP Answer"):
+
+            if ans == "Do not share the OTP":
+                st.success(
+                    "✅ Correct! OTP should be kept private."
+                )
+            else:
+                st.error(
+                    "❌ Never share OTP with another person."
+                )
+
+    elif scenario == "Suspicious Link":
+
+        st.info(
+            "You receive: 'Your account will be blocked today. "
+            "Click this link immediately.'"
+        )
+
+        ans = st.radio(
+            "What should you do?",
+            [
+                "Click the link immediately",
+                "Do not click and verify through the official app/website"
+            ]
+        )
+
+        if st.button("Check Link Answer"):
+
+            if ans.startswith("Do not"):
+                st.success("✅ Correct! Verify before clicking.")
+            else:
+                st.error("❌ Suspicious links can lead to scams.")
+
+    elif scenario == "Fake Prize Message":
+
+        st.info(
+            "You receive a message saying you won ₹50,000 "
+            "and must pay a fee first."
+        )
+
+        ans = st.radio(
+            "What should you do?",
+            [
+                "Pay the fee",
+                "Do not pay and verify the claim"
+            ]
+        )
+
+        if st.button("Check Prize Answer"):
+
+            if ans == "Do not pay and verify the claim":
+                st.success("✅ Correct! Unexpected prize claims can be scams.")
+            else:
+                st.error("❌ Do not send money to claim an unexpected prize.")
+
+    elif scenario == "Unknown Friend Request":
+
+        st.info(
+            "An unknown person sends a friend request and immediately "
+            "asks for your personal details."
+        )
+
+        ans = st.radio(
+            "What is safer?",
+            [
+                "Share my details",
+                "Do not share and verify the account"
+            ]
+        )
+
+        if st.button("Check Profile Answer"):
+
+            if ans.startswith("Do not"):
+                st.success("✅ Correct! Be careful with unknown profiles.")
+            else:
+                st.error("❌ Avoid sharing personal information.")
+
+    else:
+
+        st.info(
+            "Someone is repeatedly sending unwanted messages online."
+        )
+
+        ans = st.radio(
+            "What is a safer response?",
+            [
+                "Keep replying",
+                "Save evidence, block/report the account and seek help"
+            ]
+        )
+
+        if st.button("Check Harassment Answer"):
+
+            if ans.startswith("Save"):
+                st.success(
+                    "✅ Correct! Keep evidence and use block/report options."
+                )
+            else:
+                st.error(
+                    "❌ Repeatedly engaging may not solve the problem."
+                )
+
+
+# ============================================================
+# BACK TO HOME
+# ============================================================
+
+st.divider()
+
+if st.button("🏠 Back to Home"):
+    st.session_state.pop("topic", None)
+    st.rerun()
