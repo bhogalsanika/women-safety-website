@@ -1,14 +1,12 @@
-
 import streamlit as st
 from supabase import create_client, Client
 import pandas as pd
 import plotly.express as px
 from datetime import date
 
-
-# ============================================================
+# =========================================================
 # PAGE CONFIGURATION
-# ============================================================
+# =========================================================
 
 st.set_page_config(
     page_title="Women Safety Management System",
@@ -17,89 +15,64 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-
-# ============================================================
+# =========================================================
 # CUSTOM CSS
-# ============================================================
+# =========================================================
 
 st.markdown("""
 <style>
 
-    /* Main background */
-    .stApp {
-        background-color: #f7f8fa;
-    }
+body {
+    background-color: #f5f7fa;
+}
 
-    /* Sidebar */
-    section[data-testid="stSidebar"] {
-        background-color: #ffffff;
-        border-right: 1px solid #e2e5e9;
-    }
+[data-testid="stSidebar"] {
+    background-color: white;
+}
 
-    /* Main headings */
-    h1, h2, h3 {
-        color: #1f2937;
-        font-weight: 600;
-    }
+h1, h2, h3 {
+    color: #1f2937;
+}
 
-    /* Normal text */
-    p, label, div {
-        color: #374151;
-    }
+.stButton > button {
+    background-color: #1f4e79;
+    color: white;
+    border-radius: 6px;
+    border: none;
+}
 
-    /* Metric cards */
-    div[data-testid="stMetric"] {
-        background-color: #ffffff;
-        border: 1px solid #e2e5e9;
-        border-radius: 10px;
-        padding: 18px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-    }
+.stButton > button:hover {
+    background-color: #163a5c;
+    color: white;
+}
 
-    /* Buttons */
-    .stButton > button {
-        border-radius: 6px;
-        border: 1px solid #1f4e79;
-        background-color: #1f4e79;
-        color: white;
-        font-weight: 500;
-        padding: 8px 18px;
-    }
+.metric-card {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+    text-align: center;
+}
 
-    .stButton > button:hover {
-        background-color: #163a5c;
-        border-color: #163a5c;
-        color: white;
-    }
+.info-box {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+    margin-bottom: 15px;
+}
 
-    /* Dataframe */
-    div[data-testid="stDataFrame"] {
-        border: 1px solid #e2e5e9;
-        border-radius: 8px;
-    }
-
-    /* Info boxes */
-    .info-box {
-        background-color: #ffffff;
-        border-left: 4px solid #1f4e79;
-        padding: 15px;
-        border-radius: 5px;
-        margin-bottom: 20px;
-    }
-
-    /* Section divider */
-    .section-line {
-        border-bottom: 1px solid #e2e5e9;
-        margin: 10px 0 25px 0;
-    }
+.section-divider {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
 
 </style>
 """, unsafe_allow_html=True)
 
-
-# ============================================================
+# =========================================================
 # SUPABASE CONNECTION
-# ============================================================
+# =========================================================
 
 @st.cache_resource
 def init_connection() -> Client:
@@ -108,59 +81,58 @@ def init_connection() -> Client:
         st.secrets["SUPABASE_KEY"]
     )
 
+supabase = init_connection()
 
-try:
-    supabase = init_connection()
-except Exception as e:
-    st.error("Unable to connect to Supabase. Please verify the database credentials in Streamlit Secrets.")
-    st.stop()
-
-
-# ============================================================
+# =========================================================
 # DATABASE FUNCTIONS
-# ============================================================
+# =========================================================
 
 def get_table(table_name):
     try:
         response = supabase.table(table_name).select("*").execute()
-        return response.data
+        return pd.DataFrame(response.data)
     except Exception as e:
-        st.error(f"Unable to retrieve data from {table_name}.")
-        return []
+        st.error(f"Error loading {table_name}: {e}")
+        return pd.DataFrame()
 
 
 def add_record(table_name, data):
     try:
         supabase.table(table_name).insert(data).execute()
-        return True
+        st.success("Record added successfully.")
+        st.rerun()
     except Exception as e:
-        st.error(f"Unable to add record: {e}")
-        return False
+        st.error(f"Error adding record: {e}")
 
 
-def update_record(table_name, column, value, data):
+def update_record(table_name, record_id, id_column, data):
     try:
-        supabase.table(table_name).update(data).eq(column, value).execute()
-        return True
+        supabase.table(table_name).update(data).eq(
+            id_column, record_id
+        ).execute()
+        st.success("Record updated successfully.")
+        st.rerun()
     except Exception as e:
-        st.error(f"Unable to update record: {e}")
-        return False
+        st.error(f"Error updating record: {e}")
 
 
-def delete_record(table_name, column, value):
+def delete_record(table_name, record_id, id_column):
     try:
-        supabase.table(table_name).delete().eq(column, value).execute()
-        return True
+        supabase.table(table_name).delete().eq(
+            id_column, record_id
+        ).execute()
+        st.success("Record deleted successfully.")
+        st.rerun()
     except Exception as e:
-        st.error(f"Unable to delete record: {e}")
-        return False
+        st.error(f"Error deleting record: {e}")
 
 
-# ============================================================
-# SIDEBAR NAVIGATION
-# ============================================================
+# =========================================================
+# SIDEBAR
+# =========================================================
 
 st.sidebar.markdown("## Women Safety Management System")
+
 st.sidebar.markdown(
     "Smartphone Usage and Online Safety for Women Self Help Groups"
 )
@@ -171,6 +143,8 @@ page = st.sidebar.radio(
     "Navigation",
     [
         "Dashboard",
+        "Smartphone Usage Information",
+        "Online Safety Information",
         "Participants",
         "Smartphone Usage",
         "Safety Events",
@@ -180,674 +154,811 @@ page = st.sidebar.radio(
 )
 
 st.sidebar.markdown("---")
+
 st.sidebar.caption("Community Engagement Project")
 st.sidebar.caption("Database Management System")
 
 
-# ============================================================
+# =========================================================
 # LOAD DATA
-# ============================================================
+# =========================================================
 
 participants = get_table("participants")
-usage_records = get_table("smartphone_usage")
+smartphone_usage = get_table("smartphone_usage")
 safety_events = get_table("safety_events")
 training_sessions = get_table("training_sessions")
 
-participants_df = pd.DataFrame(participants)
-usage_df = pd.DataFrame(usage_records)
-events_df = pd.DataFrame(safety_events)
-training_df = pd.DataFrame(training_sessions)
 
-
-# ============================================================
+# =========================================================
 # DASHBOARD
-# ============================================================
+# =========================================================
 
 if page == "Dashboard":
 
     st.title("Dashboard")
+
     st.markdown(
-        "Overview of smartphone usage and online safety activities "
-        "within the Women Self Help Group."
+        "Overview of smartphone usage, online safety and community activities."
     )
 
-    st.markdown('<div class="section-line"></div>', unsafe_allow_html=True)
+    st.markdown("---")
 
     col1, col2, col3, col4 = st.columns(4)
 
-    col1.metric(
-        "Total Participants",
-        len(participants_df)
+    with col1:
+        st.metric(
+            "Total Participants",
+            len(participants)
+        )
+
+    with col2:
+        st.metric(
+            "Usage Records",
+            len(smartphone_usage)
+        )
+
+    with col3:
+        st.metric(
+            "Safety Events",
+            len(safety_events)
+        )
+
+    with col4:
+        st.metric(
+            "Training Sessions",
+            len(training_sessions)
+        )
+
+    st.markdown("---")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+
+        st.subheader("Participants by Occupation")
+
+        if not participants.empty and "occupation" in participants.columns:
+
+            occupation_data = (
+                participants["occupation"]
+                .fillna("Not Specified")
+                .value_counts()
+                .reset_index()
+            )
+
+            occupation_data.columns = ["Occupation", "Count"]
+
+            fig = px.bar(
+                occupation_data,
+                x="Occupation",
+                y="Count",
+                title="Occupation Distribution"
+            )
+
+            st.plotly_chart(fig, use_container_width=True)
+
+        else:
+            st.info("No participant data available.")
+
+    with col2:
+
+        st.subheader("Smartphone Users")
+
+        if not participants.empty and "smartphone_user" in participants.columns:
+
+            user_data = (
+                participants["smartphone_user"]
+                .value_counts()
+                .reset_index()
+            )
+
+            user_data.columns = ["Smartphone User", "Count"]
+
+            user_data["Smartphone User"] = user_data[
+                "Smartphone User"
+            ].map({
+                True: "Yes",
+                False: "No"
+            })
+
+            fig = px.pie(
+                user_data,
+                names="Smartphone User",
+                values="Count",
+                title="Smartphone Usage"
+            )
+
+            st.plotly_chart(fig, use_container_width=True)
+
+        else:
+            st.info("No smartphone user data available.")
+
+
+# =========================================================
+# SMARTPHONE USAGE INFORMATION
+# =========================================================
+
+elif page == "Smartphone Usage Information":
+
+    st.title("Smartphone Usage Information")
+
+    st.markdown(
+        """
+        Smartphones are useful tools for communication, education,
+        banking, shopping, business and accessing online services.
+        Women can use smartphones more effectively by understanding
+        their basic functions and following safe digital practices.
+        """
     )
 
-    col2.metric(
-        "Usage Records",
-        len(usage_df)
+    st.markdown("---")
+
+    st.subheader("1. Basic Smartphone Functions")
+
+    st.markdown(
+        """
+        - Making and receiving phone calls
+        - Sending and receiving messages
+        - Saving and managing contacts
+        - Using the camera
+        - Connecting to Wi-Fi and mobile data
+        - Adjusting volume and brightness
+        - Installing and updating applications
+        - Using the internet and web browsers
+        """
     )
 
-    col3.metric(
-        "Safety Events",
-        len(events_df)
+    st.subheader("2. Common Uses of Smartphones")
+
+    st.markdown(
+        """
+        Smartphones can be used for:
+
+        - Communication through calls and messaging
+        - Online education and learning
+        - Digital payments and banking
+        - Online shopping
+        - Social media
+        - Watching educational videos
+        - Online work and small businesses
+        - Accessing government and public services
+        """
     )
 
-    col4.metric(
-        "Training Sessions",
-        len(training_df)
+    st.subheader("3. Safe Smartphone Practices")
+
+    st.markdown(
+        """
+        - Keep a screen lock such as PIN, password or fingerprint.
+        - Keep the phone software updated.
+        - Install applications only from trusted official app stores.
+        - Check application permissions before allowing access.
+        - Avoid unknown or unsecured Wi-Fi networks.
+        - Keep important data backed up.
+        - Do not share your phone password with unknown people.
+        """
     )
 
-    st.markdown("### System Overview")
+    st.subheader("4. Using Mobile Applications Safely")
 
-    if participants_df.empty:
-        st.info("No participant records are available yet.")
-    else:
+    st.markdown(
+        """
+        Before installing an application:
 
-        col1, col2 = st.columns(2)
+        - Check the application name and developer.
+        - Read reviews and ratings.
+        - Check the permissions requested.
+        - Avoid downloading applications from unknown websites.
+        - Keep applications updated.
+        - Remove applications that are no longer required.
+        """
+    )
 
-        with col1:
+    st.subheader("5. Digital Literacy for Women")
 
-            if "occupation" in participants_df.columns:
+    st.markdown(
+        """
+        Smartphone knowledge can help women communicate independently,
+        access education, use digital payments, find information,
+        manage online services and participate safely in the digital world.
+        """
+    )
 
-                occupation_data = (
-                    participants_df["occupation"]
-                    .fillna("Not Specified")
-                    .value_counts()
-                    .reset_index()
-                )
-
-                occupation_data.columns = [
-                    "Occupation",
-                    "Participants"
-                ]
-
-                fig = px.bar(
-                    occupation_data,
-                    x="Occupation",
-                    y="Participants",
-                    title="Participants by Occupation"
-                )
-
-                fig.update_layout(
-                    template="simple_white",
-                    height=350
-                )
-
-                st.plotly_chart(
-                    fig,
-                    use_container_width=True
-                )
-
-        with col2:
-
-            if "smartphone_user" in participants_df.columns:
-
-                smartphone_data = (
-                    participants_df["smartphone_user"]
-                    .map({
-                        True: "Smartphone User",
-                        False: "Non-Smartphone User"
-                    })
-                    .value_counts()
-                    .reset_index()
-                )
-
-                smartphone_data.columns = [
-                    "Category",
-                    "Participants"
-                ]
-
-                fig = px.pie(
-                    smartphone_data,
-                    names="Category",
-                    values="Participants",
-                    title="Smartphone Usage Status"
-                )
-
-                fig.update_layout(
-                    height=350
-                )
-
-                st.plotly_chart(
-                    fig,
-                    use_container_width=True
-                )
+    st.info(
+        "Remember: Understand the purpose of an application before using it "
+        "and always check before sharing personal information."
+    )
 
 
-# ============================================================
+# =========================================================
+# ONLINE SAFETY INFORMATION
+# =========================================================
+
+elif page == "Online Safety Information":
+
+    st.title("Online Safety Information")
+
+    st.markdown(
+        """
+        Online safety means protecting personal information, accounts,
+        money and privacy while using smartphones and the internet.
+        """
+    )
+
+    st.markdown("---")
+
+    st.subheader("1. Password Safety")
+
+    st.markdown(
+        """
+        - Use strong and unique passwords.
+        - Avoid using your name, birthday or mobile number as a password.
+        - Do not share passwords with other people.
+        - Use different passwords for important accounts.
+        - Enable two-factor authentication whenever available.
+        """
+    )
+
+    st.subheader("2. OTP, PIN and Banking Safety")
+
+    st.markdown(
+        """
+        - Never share OTP with anyone.
+        - Never share ATM PIN, UPI PIN or CVV.
+        - Do not share banking passwords.
+        - Do not allow unknown people to operate your banking application.
+        - Check the receiver's name before making a digital payment.
+        """
+    )
+
+    st.subheader("3. Phishing and Suspicious Links")
+
+    st.markdown(
+        """
+        Phishing is an attempt to steal personal information through
+        fake messages, emails, websites or links.
+
+        Be careful with messages claiming:
+
+        - You have won a prize.
+        - Your bank account will be blocked.
+        - You must immediately update KYC.
+        - You have received a refund.
+        - You must click a link to receive money.
+
+        Always verify the sender before clicking a link.
+        """
+    )
+
+    st.subheader("4. Social Media Safety")
+
+    st.markdown(
+        """
+        - Keep social media accounts private when appropriate.
+        - Do not share your home address publicly.
+        - Avoid sharing live location publicly.
+        - Accept friend or follow requests carefully.
+        - Block and report suspicious accounts.
+        - Think before posting photos or personal information.
+        """
+    )
+
+    st.subheader("5. Digital Payment Safety")
+
+    st.markdown(
+        """
+        - Never share your UPI PIN or OTP.
+        - Verify the recipient before sending money.
+        - Do not scan unknown QR codes.
+        - Check transaction notifications and bank statements regularly.
+        - Do not click payment links received from unknown people.
+        """
+    )
+
+    st.subheader("6. Online Shopping Safety")
+
+    st.markdown(
+        """
+        - Use trusted shopping websites and applications.
+        - Check the website address before making a payment.
+        - Be careful with extremely cheap offers from unknown sellers.
+        - Do not share unnecessary personal information.
+        - Check seller details and reviews before purchasing.
+        """
+    )
+
+    st.subheader("7. Cyberbullying and Online Harassment")
+
+    st.markdown(
+        """
+        If someone is harassing or threatening you online:
+
+        - Do not respond aggressively.
+        - Block the person.
+        - Report the account or content.
+        - Save screenshots and other evidence.
+        - Inform a trusted person.
+        - Report serious incidents through appropriate cybercrime channels.
+        """
+    )
+
+    st.subheader("8. What to Do After Online Fraud")
+
+    st.markdown(
+        """
+        If you become a victim of online financial fraud:
+
+        1. Contact your bank or payment service immediately.
+        2. Secure or block the affected account or card if necessary.
+        3. Save transaction details, screenshots and messages.
+        4. Do not delete important evidence.
+        5. Report the incident through the official cybercrime reporting channel.
+        """
+    )
+
+    st.subheader("9. Simple Online Safety Rule")
+
+    st.info(
+        "STOP → CHECK → VERIFY → THEN CLICK OR PAY"
+    )
+
+
+# =========================================================
 # PARTICIPANTS
-# ============================================================
+# =========================================================
 
 elif page == "Participants":
 
-    st.title("Participant Management")
+    st.title("Participants")
 
-    st.markdown(
-        "Manage participant information associated with the Women Self Help Group."
-    )
+    st.subheader("Add Participant")
 
-    st.markdown('<div class="section-line"></div>', unsafe_allow_html=True)
+    with st.form("participant_form"):
 
-    tab1, tab2 = st.tabs([
-        "Add Participant",
-        "View Participants"
-    ])
+        name = st.text_input("Name")
 
-    # --------------------------------------------------------
-    # ADD PARTICIPANT
-    # --------------------------------------------------------
+        age = st.number_input(
+            "Age",
+            min_value=1,
+            max_value=100,
+            value=25
+        )
 
-    with tab1:
+        contact = st.text_input("Contact")
 
-        with st.form("participant_form"):
+        occupation = st.text_input("Occupation")
 
-            col1, col2 = st.columns(2)
+        smartphone_user = st.checkbox(
+            "Smartphone User",
+            value=True
+        )
 
-            with col1:
-                name = st.text_input("Full Name")
-                age = st.number_input(
-                    "Age",
-                    min_value=18,
-                    max_value=100,
-                    value=25
-                )
-                contact = st.text_input("Contact Number")
+        submitted = st.form_submit_button("Add Participant")
 
-            with col2:
-                occupation = st.text_input("Occupation")
-                smartphone_user = st.selectbox(
-                    "Smartphone User",
-                    ["Yes", "No"]
-                )
+        if submitted:
 
-            submitted = st.form_submit_button(
-                "Add Participant"
-            )
+            if name.strip() == "":
+                st.error("Please enter participant name.")
 
-            if submitted:
+            else:
 
-                if not name.strip():
-                    st.warning("Please enter the participant name.")
+                data = {
+                    "name": name,
+                    "age": age,
+                    "contact": contact,
+                    "occupation": occupation,
+                    "smartphone_user": smartphone_user
+                }
 
-                else:
-
-                    data = {
-                        "name": name.strip(),
-                        "age": age,
-                        "contact": contact.strip(),
-                        "occupation": occupation.strip(),
-                        "smartphone_user": smartphone_user == "Yes"
-                    }
-
-                    if add_record(
-                        "participants",
-                        data
-                    ):
-                        st.success(
-                            "Participant added successfully."
-                        )
-                        st.rerun()
-
-    # --------------------------------------------------------
-    # VIEW PARTICIPANTS
-    # --------------------------------------------------------
-
-    with tab2:
-
-        if participants_df.empty:
-
-            st.info("No participant records found.")
-
-        else:
-
-            search = st.text_input(
-                "Search participant"
-            )
-
-            display_df = participants_df.copy()
-
-            if search:
-
-                display_df = display_df[
-                    display_df["name"]
-                    .astype(str)
-                    .str.contains(
-                        search,
-                        case=False,
-                        na=False
-                    )
-                ]
-
-            st.dataframe(
-                display_df,
-                use_container_width=True,
-                hide_index=True
-            )
-
-            st.markdown("### Delete Participant")
-
-            participant_ids = display_df["participant_id"].tolist()
-
-            if participant_ids:
-
-                selected_id = st.selectbox(
-                    "Select Participant ID",
-                    participant_ids
+                add_record(
+                    "participants",
+                    data
                 )
 
-                if st.button("Delete Participant"):
+    st.markdown("---")
 
-                    if delete_record(
-                        "participants",
-                        "participant_id",
-                        selected_id
-                    ):
-                        st.success(
-                            "Participant deleted successfully."
-                        )
-                        st.rerun()
+    st.subheader("Participant Records")
+
+    if not participants.empty:
+
+        search = st.text_input(
+            "Search Participant"
+        )
+
+        filtered = participants.copy()
+
+        if search:
+
+            filtered = filtered[
+                filtered["name"]
+                .astype(str)
+                .str.contains(
+                    search,
+                    case=False,
+                    na=False
+                )
+            ]
+
+        st.dataframe(
+            filtered,
+            use_container_width=True
+        )
+
+        st.subheader("Delete Participant")
+
+        participant_id = st.number_input(
+            "Participant ID",
+            min_value=1,
+            step=1
+        )
+
+        if st.button("Delete Participant"):
+
+            delete_record(
+                "participants",
+                participant_id,
+                "participant_id"
+            )
+
+    else:
+
+        st.info("No participants found.")
 
 
-# ============================================================
+# =========================================================
 # SMARTPHONE USAGE
-# ============================================================
+# =========================================================
 
 elif page == "Smartphone Usage":
 
-    st.title("Smartphone Usage Management")
+    st.title("Smartphone Usage")
 
-    st.markdown(
-        "Record and analyze how participants use smartphones and digital services."
-    )
+    st.subheader("Add Smartphone Usage Record")
 
-    st.markdown('<div class="section-line"></div>', unsafe_allow_html=True)
-
-    if participants_df.empty:
+    if participants.empty:
 
         st.warning(
-            "Please add participants before recording smartphone usage."
+            "Please add participants first."
         )
 
     else:
 
-        tab1, tab2 = st.tabs([
-            "Add Usage Record",
-            "View Usage Records"
-        ])
+        with st.form("usage_form"):
 
-        with tab1:
+            participant_options = participants[
+                ["participant_id", "name"]
+            ]
 
-            participant_options = {
+            participant_display = {
                 f"{row['participant_id']} - {row['name']}":
                 row["participant_id"]
-                for _, row in participants_df.iterrows()
+                for _, row in participant_options.iterrows()
             }
 
-            with st.form("usage_form"):
-
-                participant = st.selectbox(
-                    "Participant",
-                    list(participant_options.keys())
-                )
-
-                usage_purpose = st.selectbox(
-                    "Primary Usage Purpose",
-                    [
-                        "Communication",
-                        "Social Media",
-                        "Education",
-                        "Digital Payments",
-                        "Online Shopping",
-                        "Entertainment",
-                        "Business",
-                        "Other"
-                    ]
-                )
-
-                col1, col2 = st.columns(2)
-
-                with col1:
-
-                    social_media = st.checkbox(
-                        "Uses Social Media"
-                    )
-
-                    digital_payment = st.checkbox(
-                        "Uses Digital Payments"
-                    )
-
-                    online_shopping = st.checkbox(
-                        "Uses Online Shopping"
-                    )
-
-                with col2:
-
-                    education = st.checkbox(
-                        "Uses Smartphone for Education"
-                    )
-
-                    daily_hours = st.number_input(
-                        "Daily Smartphone Usage (Hours)",
-                        min_value=0.0,
-                        max_value=24.0,
-                        value=2.0,
-                        step=0.5
-                    )
-
-                submitted = st.form_submit_button(
-                    "Add Usage Record"
-                )
-
-                if submitted:
-
-                    data = {
-                        "participant_id":
-                            participant_options[participant],
-                        "usage_purpose":
-                            usage_purpose,
-                        "social_media":
-                            social_media,
-                        "digital_payment":
-                            digital_payment,
-                        "online_shopping":
-                            online_shopping,
-                        "education":
-                            education,
-                        "daily_usage_hours":
-                            daily_hours
-                    }
-
-                    if add_record(
-                        "smartphone_usage",
-                        data
-                    ):
-                        st.success(
-                            "Smartphone usage record added successfully."
-                        )
-                        st.rerun()
-
-        with tab2:
-
-            if usage_df.empty:
-
-                st.info(
-                    "No smartphone usage records found."
-                )
-
-            else:
-
-                st.dataframe(
-                    usage_df,
-                    use_container_width=True,
-                    hide_index=True
-                )
-
-
-# ============================================================
-# SAFETY EVENTS
-# ============================================================
-
-elif page == "Safety Events":
-
-    st.title("Online Safety Events")
-
-    st.markdown(
-        "Record online safety concerns and actions taken by participants."
-    )
-
-    st.markdown('<div class="section-line"></div>', unsafe_allow_html=True)
-
-    if participants_df.empty:
-
-        st.warning(
-            "Please add participants before recording safety events."
-        )
-
-    else:
-
-        tab1, tab2 = st.tabs([
-            "Report Safety Event",
-            "View Events"
-        ])
-
-        with tab1:
-
-            participant_options = {
-                f"{row['participant_id']} - {row['name']}":
-                row["participant_id"]
-                for _, row in participants_df.iterrows()
-            }
-
-            with st.form("safety_form"):
-
-                participant = st.selectbox(
-                    "Participant",
-                    list(participant_options.keys())
-                )
-
-                event_type = st.selectbox(
-                    "Event Type",
-                    [
-                        "Suspicious Message",
-                        "Phishing Link",
-                        "Online Scam",
-                        "Fake Account",
-                        "Cyberbullying",
-                        "Payment Fraud Attempt",
-                        "Privacy Concern",
-                        "Other"
-                    ]
-                )
-
-                event_date = st.date_input(
-                    "Event Date",
-                    value=date.today()
-                )
-
-                description = st.text_area(
-                    "Description"
-                )
-
-                action_taken = st.text_area(
-                    "Action Taken"
-                )
-
-                reported = st.selectbox(
-                    "Reported",
-                    ["Yes", "No"]
-                )
-
-                submitted = st.form_submit_button(
-                    "Save Safety Event"
-                )
-
-                if submitted:
-
-                    data = {
-                        "participant_id":
-                            participant_options[participant],
-                        "event_type":
-                            event_type,
-                        "event_date":
-                            str(event_date),
-                        "description":
-                            description,
-                        "action_taken":
-                            action_taken,
-                        "reported":
-                            reported == "Yes"
-                    }
-
-                    if add_record(
-                        "safety_events",
-                        data
-                    ):
-                        st.success(
-                            "Safety event recorded successfully."
-                        )
-                        st.rerun()
-
-        with tab2:
-
-            if events_df.empty:
-
-                st.info(
-                    "No safety events have been recorded."
-                )
-
-            else:
-
-                st.dataframe(
-                    events_df,
-                    use_container_width=True,
-                    hide_index=True
-                )
-
-
-# ============================================================
-# TRAINING SESSIONS
-# ============================================================
-
-elif page == "Training Sessions":
-
-    st.title("Training and Awareness Sessions")
-
-    st.markdown(
-        "Manage digital literacy and online safety awareness sessions."
-    )
-
-    st.markdown('<div class="section-line"></div>', unsafe_allow_html=True)
-
-    tab1, tab2 = st.tabs([
-        "Add Session",
-        "View Sessions"
-    ])
-
-    with tab1:
-
-        with st.form("training_form"):
-
-            session_date = st.date_input(
-                "Session Date",
-                value=date.today()
+            selected_participant = st.selectbox(
+                "Participant",
+                list(participant_display.keys())
             )
 
-            topic = st.selectbox(
-                "Training Topic",
+            usage_purpose = st.selectbox(
+                "Primary Usage Purpose",
                 [
-                    "Smartphone Basics",
-                    "Password Security",
-                    "Online Banking Safety",
-                    "Digital Payments",
-                    "Social Media Safety",
-                    "Phishing Awareness",
-                    "Privacy Settings",
-                    "Cyber Fraud Awareness",
-                    "Other"
+                    "Communication",
+                    "Education",
+                    "Digital Payment",
+                    "Social Media",
+                    "Online Shopping",
+                    "Business",
+                    "Entertainment",
+                    "Government Services"
                 ]
             )
 
-            trainer_name = st.text_input(
-                "Trainer / Resource Person"
+            social_media = st.checkbox(
+                "Social Media"
             )
 
-            participants_count = st.number_input(
-                "Number of Participants",
-                min_value=1,
-                max_value=1000,
-                value=10
+            digital_payment = st.checkbox(
+                "Digital Payment"
             )
 
-            notes = st.text_area(
-                "Notes"
+            online_shopping = st.checkbox(
+                "Online Shopping"
+            )
+
+            education = st.checkbox(
+                "Education"
+            )
+
+            daily_usage_hours = st.number_input(
+                "Daily Usage Hours",
+                min_value=0.0,
+                max_value=24.0,
+                value=2.0,
+                step=0.5
             )
 
             submitted = st.form_submit_button(
-                "Add Training Session"
+                "Add Usage Record"
             )
 
             if submitted:
 
                 data = {
-                    "session_date":
-                        str(session_date),
-                    "topic":
-                        topic,
-                    "trainer_name":
-                        trainer_name.strip(),
-                    "participants_count":
-                        participants_count,
-                    "notes":
-                        notes.strip()
+                    "participant_id":
+                        participant_display[selected_participant],
+
+                    "usage_purpose":
+                        usage_purpose,
+
+                    "social_media":
+                        social_media,
+
+                    "digital_payment":
+                        digital_payment,
+
+                    "online_shopping":
+                        online_shopping,
+
+                    "education":
+                        education,
+
+                    "daily_usage_hours":
+                        daily_usage_hours
                 }
 
-                if add_record(
-                    "training_sessions",
+                add_record(
+                    "smartphone_usage",
                     data
-                ):
-                    st.success(
-                        "Training session added successfully."
-                    )
-                    st.rerun()
+                )
 
-    with tab2:
+    st.markdown("---")
 
-        if training_df.empty:
+    st.subheader("Smartphone Usage Records")
 
-            st.info(
-                "No training sessions found."
+    if not smartphone_usage.empty:
+
+        st.dataframe(
+            smartphone_usage,
+            use_container_width=True
+        )
+
+    else:
+
+        st.info(
+            "No smartphone usage records found."
+        )
+
+
+# =========================================================
+# SAFETY EVENTS
+# =========================================================
+
+elif page == "Safety Events":
+
+    st.title("Safety Events")
+
+    st.subheader("Add Safety Event")
+
+    if participants.empty:
+
+        st.warning(
+            "Please add participants first."
+        )
+
+    else:
+
+        with st.form("safety_event_form"):
+
+            participant_options = participants[
+                ["participant_id", "name"]
+            ]
+
+            participant_display = {
+                f"{row['participant_id']} - {row['name']}":
+                row["participant_id"]
+                for _, row in participant_options.iterrows()
+            }
+
+            selected_participant = st.selectbox(
+                "Participant",
+                list(participant_display.keys())
             )
 
-        else:
-
-            st.dataframe(
-                training_df,
-                use_container_width=True,
-                hide_index=True
+            event_type = st.selectbox(
+                "Event Type",
+                [
+                    "Phishing",
+                    "Online Fraud",
+                    "Cyberbullying",
+                    "Fake Account",
+                    "Suspicious Link",
+                    "Payment Fraud",
+                    "Harassment",
+                    "Other"
+                ]
             )
 
+            event_date = st.date_input(
+                "Event Date",
+                value=date.today()
+            )
 
-# ============================================================
+            description = st.text_area(
+                "Description"
+            )
+
+            action_taken = st.text_area(
+                "Action Taken"
+            )
+
+            reported = st.checkbox(
+                "Reported"
+            )
+
+            submitted = st.form_submit_button(
+                "Add Safety Event"
+            )
+
+            if submitted:
+
+                data = {
+                    "participant_id":
+                        participant_display[selected_participant],
+
+                    "event_type":
+                        event_type,
+
+                    "event_date":
+                        str(event_date),
+
+                    "description":
+                        description,
+
+                    "action_taken":
+                        action_taken,
+
+                    "reported":
+                        reported
+                }
+
+                add_record(
+                    "safety_events",
+                    data
+                )
+
+    st.markdown("---")
+
+    st.subheader("Safety Event Records")
+
+    if not safety_events.empty:
+
+        st.dataframe(
+            safety_events,
+            use_container_width=True
+        )
+
+    else:
+
+        st.info(
+            "No safety events found."
+        )
+
+
+# =========================================================
+# TRAINING SESSIONS
+# =========================================================
+
+elif page == "Training Sessions":
+
+    st.title("Training Sessions")
+
+    st.subheader("Add Training Session")
+
+    with st.form("training_form"):
+
+        session_date = st.date_input(
+            "Session Date",
+            value=date.today()
+        )
+
+        topic = st.text_input(
+            "Topic"
+        )
+
+        trainer_name = st.text_input(
+            "Trainer Name"
+        )
+
+        participants_count = st.number_input(
+            "Number of Participants",
+            min_value=0,
+            value=0
+        )
+
+        notes = st.text_area(
+            "Notes"
+        )
+
+        submitted = st.form_submit_button(
+            "Add Training Session"
+        )
+
+        if submitted:
+
+            data = {
+                "session_date":
+                    str(session_date),
+
+                "topic":
+                    topic,
+
+                "trainer_name":
+                    trainer_name,
+
+                "participants_count":
+                    participants_count,
+
+                "notes":
+                    notes
+            }
+
+            add_record(
+                "training_sessions",
+                data
+            )
+
+    st.markdown("---")
+
+    st.subheader("Training Session Records")
+
+    if not training_sessions.empty:
+
+        st.dataframe(
+            training_sessions,
+            use_container_width=True
+        )
+
+    else:
+
+        st.info(
+            "No training sessions found."
+        )
+
+
+# =========================================================
 # REPORTS
-# ============================================================
+# =========================================================
 
 elif page == "Reports":
 
-    st.title("Reports and Analysis")
+    st.title("Reports")
 
-    st.markdown(
-        "Analyze smartphone usage, online safety events, and training activities."
-    )
+    # -----------------------------------------------------
+    # SAFETY EVENTS REPORT
+    # -----------------------------------------------------
 
-    st.markdown('<div class="section-line"></div>', unsafe_allow_html=True)
+    st.subheader("Safety Events Report")
 
-    # --------------------------------------------------------
-    # SAFETY EVENT ANALYSIS
-    # --------------------------------------------------------
+    if not safety_events.empty:
 
-    if not events_df.empty and "event_type" in events_df.columns:
-
-        st.subheader("Online Safety Event Analysis")
-
-        event_counts = (
-            events_df["event_type"]
+        event_data = (
+            safety_events["event_type"]
+            .fillna("Not Specified")
             .value_counts()
             .reset_index()
         )
 
-        event_counts.columns = [
+        event_data.columns = [
             "Event Type",
-            "Number of Events"
+            "Count"
         ]
 
         fig = px.bar(
-            event_counts,
+            event_data,
             x="Event Type",
-            y="Number of Events",
+            y="Count",
             title="Safety Events by Type"
-        )
-
-        fig.update_layout(
-            template="simple_white",
-            height=400
         )
 
         st.plotly_chart(
@@ -855,86 +966,93 @@ elif page == "Reports":
             use_container_width=True
         )
 
-    # --------------------------------------------------------
-    # SMARTPHONE USAGE ANALYSIS
-    # --------------------------------------------------------
+    else:
 
-    if not usage_df.empty:
+        st.info(
+            "No safety event data available."
+        )
 
-        st.subheader("Smartphone Usage Analysis")
+    # -----------------------------------------------------
+    # SMARTPHONE USAGE REPORT
+    # -----------------------------------------------------
 
-        if "usage_purpose" in usage_df.columns:
+    st.subheader("Smartphone Usage Report")
 
-            purpose_counts = (
-                usage_df["usage_purpose"]
+    if not smartphone_usage.empty:
+
+        usage_data = (
+            smartphone_usage["usage_purpose"]
+            .fillna("Not Specified")
+            .value_counts()
+            .reset_index()
+        )
+
+        usage_data.columns = [
+            "Usage Purpose",
+            "Count"
+        ]
+
+        fig = px.bar(
+            usage_data,
+            x="Usage Purpose",
+            y="Count",
+            title="Smartphone Usage by Purpose"
+        )
+
+        st.plotly_chart(
+            fig,
+            use_container_width=True
+        )
+
+        if "daily_usage_hours" in smartphone_usage.columns:
+
+            avg_hours = pd.to_numeric(
+                smartphone_usage["daily_usage_hours"],
+                errors="coerce"
+            ).mean()
+
+            if pd.notna(avg_hours):
+
+                st.metric(
+                    "Average Daily Smartphone Usage",
+                    f"{avg_hours:.2f} hours"
+                )
+
+    else:
+
+        st.info(
+            "No smartphone usage data available."
+        )
+
+    # -----------------------------------------------------
+    # TRAINING REPORT
+    # -----------------------------------------------------
+
+    st.subheader("Training Sessions Report")
+
+    if not training_sessions.empty:
+
+        training_data = training_sessions.copy()
+
+        if "topic" in training_data.columns:
+
+            topic_data = (
+                training_data["topic"]
+                .fillna("Not Specified")
                 .value_counts()
                 .reset_index()
             )
 
-            purpose_counts.columns = [
-                "Purpose",
-                "Records"
-            ]
-
-            fig = px.bar(
-                purpose_counts,
-                x="Purpose",
-                y="Records",
-                title="Primary Smartphone Usage Purpose"
-            )
-
-            fig.update_layout(
-                template="simple_white",
-                height=400
-            )
-
-            st.plotly_chart(
-                fig,
-                use_container_width=True
-            )
-
-        if "daily_usage_hours" in usage_df.columns:
-
-            average_hours = usage_df[
-                "daily_usage_hours"
-            ].mean()
-
-            st.metric(
-                "Average Daily Smartphone Usage",
-                f"{average_hours:.2f} hours"
-            )
-
-    # --------------------------------------------------------
-    # TRAINING ANALYSIS
-    # --------------------------------------------------------
-
-    if not training_df.empty:
-
-        st.subheader("Training Activity")
-
-        if "topic" in training_df.columns:
-
-            training_counts = (
-                training_df["topic"]
-                .value_counts()
-                .reset_index()
-            )
-
-            training_counts.columns = [
+            topic_data.columns = [
                 "Topic",
                 "Sessions"
             ]
 
             fig = px.bar(
-                training_counts,
+                topic_data,
                 x="Topic",
                 y="Sessions",
                 title="Training Sessions by Topic"
-            )
-
-            fig.update_layout(
-                template="simple_white",
-                height=400
             )
 
             st.plotly_chart(
@@ -942,54 +1060,71 @@ elif page == "Reports":
                 use_container_width=True
             )
 
-    # --------------------------------------------------------
-    # EXPORT DATA
-    # --------------------------------------------------------
+    else:
 
-    st.subheader("Data Export")
+        st.info(
+            "No training session data available."
+        )
 
-    export_option = st.selectbox(
-        "Select Dataset",
-        [
-            "Participants",
-            "Smartphone Usage",
-            "Safety Events",
-            "Training Sessions"
-        ]
-    )
+    # -----------------------------------------------------
+    # CSV EXPORT
+    # -----------------------------------------------------
 
-    export_mapping = {
-        "Participants": participants_df,
-        "Smartphone Usage": usage_df,
-        "Safety Events": events_df,
-        "Training Sessions": training_df
-    }
+    st.markdown("---")
 
-    selected_df = export_mapping[export_option]
+    st.subheader("Export Reports")
 
-    if not selected_df.empty:
+    if not participants.empty:
 
-        csv_data = selected_df.to_csv(
+        participants_csv = participants.to_csv(
             index=False
         ).encode("utf-8")
 
         st.download_button(
-            "Download CSV Report",
-            data=csv_data,
-            file_name=(
-                export_option.lower()
-                .replace(" ", "_")
-                + "_report.csv"
-            ),
-            mime="text/csv"
+            "Download Participants CSV",
+            participants_csv,
+            "participants.csv",
+            "text/csv"
         )
 
-    else:
+    if not smartphone_usage.empty:
 
-        st.info(
-            "No data available for export."
+        usage_csv = smartphone_usage.to_csv(
+            index=False
+        ).encode("utf-8")
+
+        st.download_button(
+            "Download Smartphone Usage CSV",
+            usage_csv,
+            "smartphone_usage.csv",
+            "text/csv"
         )
 
+    if not safety_events.empty:
+
+        safety_csv = safety_events.to_csv(
+            index=False
+        ).encode("utf-8")
+
+        st.download_button(
+            "Download Safety Events CSV",
+            safety_csv,
+            "safety_events.csv",
+            "text/csv"
+        )
+
+    if not training_sessions.empty:
+
+        training_csv = training_sessions.to_csv(
+            index=False
+        ).encode("utf-8")
+
+        st.download_button(
+            "Download Training Sessions CSV",
+            training_csv,
+            "training_sessions.csv",
+            "text/csv"
+        )
 
 
 
