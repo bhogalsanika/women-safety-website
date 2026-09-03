@@ -1,5 +1,6 @@
-
 import streamlit as st
+from supabase import create_client
+from datetime import datetime
 
 # ============================================================
 # DIGITAL SAHELI
@@ -15,7 +16,22 @@ st.set_page_config(
 )
 
 # ============================================================
-# CSS
+# SUPABASE BACKEND
+# ============================================================
+
+@st.cache_resource
+def init_supabase():
+    try:
+        url = st.secrets["SUPABASE_URL"]
+        key = st.secrets["SUPABASE_KEY"]
+        return create_client(url, key)
+    except Exception:
+        return None
+
+supabase = init_supabase()
+
+# ============================================================
+# MOBILE RESPONSIVE CSS
 # ============================================================
 
 st.markdown("""
@@ -28,9 +44,11 @@ st.markdown("""
 .block-container {
     padding-top: 1.5rem;
     padding-bottom: 3rem;
+    max-width: 1200px;
 }
 
 /* Header */
+
 .header {
     background: linear-gradient(135deg, #f8d7e6, #eadcf8);
     padding: 35px;
@@ -51,6 +69,7 @@ st.markdown("""
 }
 
 /* Cards */
+
 .card {
     background: white;
     border-radius: 20px;
@@ -70,6 +89,7 @@ st.markdown("""
 }
 
 /* Safety box */
+
 .safety-box {
     background: #fff0c2;
     padding: 22px;
@@ -78,6 +98,7 @@ st.markdown("""
 }
 
 /* Emergency */
+
 .emergency-box {
     background: #ffe5e5;
     padding: 25px;
@@ -87,6 +108,7 @@ st.markdown("""
 }
 
 /* Section title */
+
 .section-title {
     color: #8b2457;
     font-size: 30px;
@@ -94,11 +116,116 @@ st.markdown("""
     margin-top: 15px;
 }
 
+/* Buttons */
+
+.stButton > button {
+    border-radius: 12px;
+    min-height: 45px;
+}
+
 /* Footer */
+
 .footer {
     text-align: center;
     color: #777;
     padding: 25px;
+}
+
+/* ==========================================================
+   MOBILE
+   ========================================================== */
+
+@media only screen and (max-width: 768px) {
+
+    .block-container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+        padding-top: 1rem;
+    }
+
+    .header {
+        padding: 22px 15px;
+        border-radius: 18px;
+    }
+
+    .header h1 {
+        font-size: 32px;
+    }
+
+    .header p {
+        font-size: 16px;
+    }
+
+    .card {
+        padding: 18px;
+        min-height: auto;
+        border-radius: 16px;
+    }
+
+    .card h3 {
+        font-size: 21px;
+    }
+
+    .section-title {
+        font-size: 25px;
+    }
+
+    .emergency-box {
+        padding: 18px 10px;
+        margin-bottom: 12px;
+    }
+
+    .emergency-box h1 {
+        font-size: 35px;
+    }
+
+    .emergency-box h2 {
+        font-size: 25px;
+    }
+
+    h1 {
+        font-size: 30px !important;
+    }
+
+    h2 {
+        font-size: 25px !important;
+    }
+
+    h3 {
+        font-size: 21px !important;
+    }
+
+    p {
+        font-size: 15px;
+    }
+
+    .stButton > button {
+        width: 100%;
+        min-height: 48px;
+    }
+
+}
+
+/* Very small phones */
+
+@media only screen and (max-width: 480px) {
+
+    .header h1 {
+        font-size: 28px;
+    }
+
+    .header p {
+        font-size: 14px;
+    }
+
+    .card {
+        padding: 15px;
+    }
+
+    .safety-box {
+        padding: 17px;
+    }
+
 }
 
 </style>
@@ -173,6 +300,7 @@ if page == "🏠 Home":
     col1, col2, col3 = st.columns(3)
 
     with col1:
+
         st.markdown("""
         <div class="card">
             <h3>📱 Smartphone Learning</h3>
@@ -183,10 +311,17 @@ if page == "🏠 Home":
         </div>
         """, unsafe_allow_html=True)
 
-        if st.button("📱 Start Learning", use_container_width=True):
-            st.info("Select '📱 Smartphone Learning' from the menu.")
+        if st.button(
+            "📱 Start Learning",
+            use_container_width=True,
+            key="home_learning"
+        ):
+            st.info(
+                "Select '📱 Smartphone Learning' from the menu."
+            )
 
     with col2:
+
         st.markdown("""
         <div class="card">
             <h3>🛡️ Online Safety</h3>
@@ -197,10 +332,17 @@ if page == "🏠 Home":
         </div>
         """, unsafe_allow_html=True)
 
-        if st.button("🛡️ Learn Safety", use_container_width=True):
-            st.info("Select '🛡️ Online Safety' from the menu.")
+        if st.button(
+            "🛡️ Learn Safety",
+            use_container_width=True,
+            key="home_safety"
+        ):
+            st.info(
+                "Select '🛡️ Online Safety' from the menu."
+            )
 
     with col3:
+
         st.markdown("""
         <div class="card">
             <h3>🚨 Women Safety</h3>
@@ -211,8 +353,14 @@ if page == "🏠 Home":
         </div>
         """, unsafe_allow_html=True)
 
-        if st.button("🚨 Get Help", use_container_width=True):
-            st.info("Select '🚨 Women Safety' from the menu.")
+        if st.button(
+            "🚨 Get Help",
+            use_container_width=True,
+            key="home_help"
+        ):
+            st.info(
+                "Select '🚨 Women Safety' from the menu."
+            )
 
     st.write("")
 
@@ -229,17 +377,32 @@ if page == "🏠 Home":
     a, b, c, d = st.columns(4)
 
     with a:
-        st.button("📱 Learn Smartphone", use_container_width=True)
+        st.button(
+            "📱 Learn Smartphone",
+            use_container_width=True,
+            key="quick_phone"
+        )
 
     with b:
-        st.button("⚠️ Check Scam", use_container_width=True)
+        st.button(
+            "⚠️ Check Scam",
+            use_container_width=True,
+            key="quick_scam"
+        )
 
     with c:
-        st.button("🎯 Take Quiz", use_container_width=True)
+        st.button(
+            "🎯 Take Quiz",
+            use_container_width=True,
+            key="quick_quiz"
+        )
 
     with d:
-        st.button("🚨 Safety Help", use_container_width=True)
-
+        st.button(
+            "🚨 Safety Help",
+            use_container_width=True,
+            key="quick_help"
+        )
 
 # ============================================================
 # SMARTPHONE LEARNING
@@ -404,7 +567,6 @@ elif page == "📱 Smartphone Learning":
 
         🔄 Software updates
         """)
-
 
 # ============================================================
 # ONLINE SAFETY
@@ -574,7 +736,6 @@ elif page == "🛡️ Online Safety":
         👤 Fake social-media accounts
         """)
 
-
 # ============================================================
 # SCAM DETECTOR
 # ============================================================
@@ -600,7 +761,11 @@ elif page == "⚠️ Scam Detector":
         ]
     )
 
-    if st.button("🔍 Check Situation", use_container_width=True):
+    if st.button(
+        "🔍 Check Situation",
+        use_container_width=True,
+        key="check_scam"
+    ):
 
         st.divider()
 
@@ -671,9 +836,8 @@ elif page == "⚠️ Scam Detector":
                 "trusted person if you feel threatened."
             )
 
-
 # ============================================================
-# QUIZ
+# QUIZ + DATABASE STORAGE
 # ============================================================
 
 elif page == "🎯 Safety Quiz":
@@ -684,16 +848,30 @@ elif page == "🎯 Safety Quiz":
         "Answer the questions and check your score."
     )
 
+    # --------------------------------------------------------
+    # NAME
+    # --------------------------------------------------------
+
+    user_name = st.text_input(
+        "👩 Enter your name",
+        placeholder="Enter your name",
+        key="quiz_name"
+    )
+
+    # --------------------------------------------------------
+    # QUESTIONS
+    # --------------------------------------------------------
+
     q1 = st.radio(
         "1️⃣ Should you share your OTP with someone who calls you?",
         ["Yes", "No"],
-        key="q1"
+        key="quiz_q1"
     )
 
     q2 = st.radio(
         "2️⃣ Should you share your UPI PIN with anyone?",
         ["Yes", "No"],
-        key="q2"
+        key="quiz_q2"
     )
 
     q3 = st.radio(
@@ -703,60 +881,126 @@ elif page == "🎯 Safety Quiz":
             "Ignore and verify",
             "Forward to friends"
         ],
-        key="q3"
+        key="quiz_q3"
     )
 
     q4 = st.radio(
         "4️⃣ Is a strong password important?",
         ["Yes", "No"],
-        key="q4"
+        key="quiz_q4"
     )
 
     q5 = st.radio(
         "5️⃣ Should you accept every unknown social-media request?",
         ["Yes", "No"],
-        key="q5"
+        key="quiz_q5"
     )
 
-    if st.button("🎯 Submit Quiz", use_container_width=True):
+    # --------------------------------------------------------
+    # SUBMIT
+    # --------------------------------------------------------
 
-        score = 0
+    if st.button(
+        "🎯 Submit Quiz",
+        use_container_width=True,
+        key="submit_quiz"
+    ):
 
-        if q1 == "No":
-            score += 1
+        if not user_name.strip():
 
-        if q2 == "No":
-            score += 1
-
-        if q3 == "Ignore and verify":
-            score += 1
-
-        if q4 == "Yes":
-            score += 1
-
-        if q5 == "No":
-            score += 1
-
-        st.divider()
-
-        st.subheader(f"🏆 Your Score: {score}/5")
-
-        if score == 5:
-            st.success(
-                "🌟 Excellent! You understand the basic online safety rules."
-            )
-            st.balloons()
-
-        elif score >= 3:
-            st.info(
-                "👍 Good job! Keep learning and practicing safe digital habits."
+            st.warning(
+                "⚠️ Please enter your name before submitting the quiz."
             )
 
         else:
-            st.warning(
-                "📚 Keep learning. Review the Online Safety section and try again."
+
+            score = 0
+
+            if q1 == "No":
+                score += 1
+
+            if q2 == "No":
+                score += 1
+
+            if q3 == "Ignore and verify":
+                score += 1
+
+            if q4 == "Yes":
+                score += 1
+
+            if q5 == "No":
+                score += 1
+
+            total = 5
+
+            # =================================================
+            # SAVE TO SUPABASE
+            # =================================================
+
+            if supabase is not None:
+
+                try:
+
+                    supabase.table("quiz_results").insert({
+                        "user_name": user_name.strip(),
+                        "score": score,
+                        "total": total,
+                        "created_at": datetime.now().isoformat()
+                    }).execute()
+
+                    st.success(
+                        "✅ Your quiz result has been saved!"
+                    )
+
+                except Exception as e:
+
+                    st.error(
+                        "❌ Quiz result could not be saved to database."
+                    )
+
+                    st.caption(
+                        "Check your Supabase table name and column names."
+                    )
+
+            else:
+
+                st.warning(
+                    "⚠️ Supabase connection is not configured."
+                )
+
+            # =================================================
+            # RESULT
+            # =================================================
+
+            st.divider()
+
+            st.subheader(
+                f"🏆 Your Score: {score}/{total}"
             )
 
+            st.write(
+                f"👩 Participant: **{user_name.strip()}**"
+            )
+
+            if score == 5:
+
+                st.success(
+                    "🌟 Excellent! You understand the basic online safety rules."
+                )
+
+                st.balloons()
+
+            elif score >= 3:
+
+                st.info(
+                    "👍 Good job! Keep learning and practicing safe digital habits."
+                )
+
+            else:
+
+                st.warning(
+                    "📚 Keep learning. Review the Online Safety section and try again."
+                )
 
 # ============================================================
 # WOMEN SAFETY
@@ -773,6 +1017,7 @@ elif page == "🚨 Women Safety":
     col1, col2, col3 = st.columns(3)
 
     with col1:
+
         st.markdown("""
         <div class="emergency-box">
         <h1>🚨</h1>
@@ -782,6 +1027,7 @@ elif page == "🚨 Women Safety":
         """, unsafe_allow_html=True)
 
     with col2:
+
         st.markdown("""
         <div class="emergency-box">
         <h1>👩</h1>
@@ -791,6 +1037,7 @@ elif page == "🚨 Women Safety":
         """, unsafe_allow_html=True)
 
     with col3:
+
         st.markdown("""
         <div class="emergency-box">
         <h1>💻</h1>
@@ -812,15 +1059,29 @@ elif page == "🚨 Women Safety":
 
     st.subheader("📞 Emergency Contact Checklist")
 
-    st.checkbox("Save a trusted family member's number")
-    st.checkbox("Save an emergency contact")
-    st.checkbox("Keep phone screen lock enabled")
-    st.checkbox("Keep important phone numbers accessible")
+    st.checkbox(
+        "Save a trusted family member's number",
+        key="emergency_family"
+    )
+
+    st.checkbox(
+        "Save an emergency contact",
+        key="emergency_contact"
+    )
+
+    st.checkbox(
+        "Keep phone screen lock enabled",
+        key="emergency_lock"
+    )
+
+    st.checkbox(
+        "Keep important phone numbers accessible",
+        key="emergency_numbers"
+    )
 
     st.info(
         "If you are in immediate danger, contact emergency services."
     )
-
 
 # ============================================================
 # REPORT CYBER CRIME
@@ -867,7 +1128,6 @@ elif page == "💻 Report Cyber Crime":
     6. Use the official cybercrime reporting portal.
     """)
 
-
 # ============================================================
 # FOOTER
 # ============================================================
@@ -876,9 +1136,12 @@ st.divider()
 
 st.markdown("""
 <div class="footer">
+
 🌸 <b>Digital Saheli</b><br>
+
 CEP Project — Smartphone Usage & Online Safety for Women<br>
+
 Learn • Protect • Stay Connected
+
 </div>
 """, unsafe_allow_html=True)
-
