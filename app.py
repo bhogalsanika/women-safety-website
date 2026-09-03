@@ -1,4 +1,4 @@
-```python
+
 import streamlit as st
 
 # =========================================================
@@ -453,5 +453,4 @@ elif page == "⚠️ Scam Detector":
             "🔗 I received a KYC update link",
             "🎁 I received a lottery/prize message",
             "💳 Someone asked for UPI PIN",
-           
-```
+
