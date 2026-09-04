@@ -6,7 +6,7 @@ from datetime import datetime
 
 
 # ============================================================
-# PAGE CONFIG
+# PAGE CONFIGURATION
 # ============================================================
 
 st.set_page_config(
@@ -35,12 +35,6 @@ h1, h2, h3 {
     background-color: #fff5f8;
 }
 
-[data-testid="stSidebar"] h1,
-[data-testid="stSidebar"] h2,
-[data-testid="stSidebar"] h3 {
-    color: #7b1e3a;
-}
-
 .stButton > button {
     border-radius: 8px;
     font-weight: 600;
@@ -63,7 +57,6 @@ div[data-testid="metric-container"] {
 
 @st.cache_resource
 def init_connection():
-
     return create_client(
         st.secrets["SUPABASE_URL"],
         st.secrets["SUPABASE_KEY"]
@@ -80,7 +73,6 @@ supabase = init_connection()
 def get_table(table_name):
 
     try:
-
         response = (
             supabase
             .table(table_name)
@@ -121,57 +113,8 @@ def add_record(table_name, data):
         return False
 
 
-def delete_record(table_name, column, value):
-
-    try:
-
-        (
-            supabase
-            .table(table_name)
-            .delete()
-            .eq(column, value)
-            .execute()
-        )
-
-        return True
-
-    except Exception as e:
-
-        st.error(
-            f"Delete error: {e}"
-        )
-
-        return False
-
-
 # ============================================================
-# SESSION STATE
-# ============================================================
-
-if "quiz_started" not in st.session_state:
-    st.session_state.quiz_started = False
-
-if "quiz_current" not in st.session_state:
-    st.session_state.quiz_current = 0
-
-if "quiz_answers" not in st.session_state:
-    st.session_state.quiz_answers = {}
-
-if "quiz_participant_id" not in st.session_state:
-    st.session_state.quiz_participant_id = None
-
-if "quiz_participant_name" not in st.session_state:
-    st.session_state.quiz_participant_name = ""
-
-if "quiz_finished" not in st.session_state:
-    st.session_state.quiz_finished = False
-
-if "quiz_score" not in st.session_state:
-    st.session_state.quiz_score = 0
-
-
-# ============================================================
-# SIDEBAR
+# SIDEBAR NAVIGATION
 # ============================================================
 
 st.sidebar.title("🌸 Digital Safety")
@@ -190,7 +133,6 @@ page = st.sidebar.radio(
         "📱 Smartphone Usage",
         "📚 Smartphone Guide",
         "🛡️ Women Safety",
-        "📝 Safety Quiz",
         "🚨 Safety Records",
         "☎️ Help & Emergency",
         "🎓 Training Sessions",
@@ -200,12 +142,14 @@ page = st.sidebar.radio(
 
 
 # ============================================================
-# LOAD DATA
+# LOAD PARTICIPANTS
 # ============================================================
 
 participants = get_table("participants")
 
-participants_df = pd.DataFrame(participants)
+participants_df = pd.DataFrame(
+    participants
+)
 
 
 # ============================================================
@@ -223,17 +167,21 @@ if page == "🏠 Dashboard":
     )
 
     st.write(
-        "A simple digital awareness platform to help women "
+        "A simple digital awareness platform that helps women "
         "learn smartphone usage, online safety and safe digital practices."
     )
 
     st.divider()
 
-    quiz_results = get_table("quiz_results")
-    safety_events = get_table("safety_events")
-    training_sessions = get_table("training_sessions")
+    safety_events = get_table(
+        "safety_events"
+    )
 
-    col1, col2, col3, col4 = st.columns(4)
+    training_sessions = get_table(
+        "training_sessions"
+    )
+
+    col1, col2, col3 = st.columns(3)
 
     with col1:
 
@@ -245,18 +193,11 @@ if page == "🏠 Dashboard":
     with col2:
 
         st.metric(
-            "📝 Quiz Attempts",
-            len(quiz_results)
-        )
-
-    with col3:
-
-        st.metric(
             "🚨 Safety Records",
             len(safety_events)
         )
 
-    with col4:
+    with col3:
 
         st.metric(
             "🎓 Training Sessions",
@@ -265,7 +206,9 @@ if page == "🏠 Dashboard":
 
     st.divider()
 
-    st.subheader("📌 What this system provides")
+    st.subheader(
+        "📌 System Features"
+    )
 
     c1, c2, c3 = st.columns(3)
 
@@ -281,16 +224,16 @@ if page == "🏠 Dashboard":
 
         st.warning(
             "🛡️ **Online Safety**\n\n"
-            "Learn password safety, OTP safety, "
-            "UPI safety, phishing and social media privacy."
+            "Learn password safety, OTP safety, UPI safety, "
+            "phishing and social media privacy."
         )
 
     with c3:
 
         st.success(
-            "📝 **Interactive Quiz**\n\n"
-            "Test your knowledge and store participant "
-            "quiz results in the database."
+            "🎓 **Training Management**\n\n"
+            "Record awareness sessions and store training "
+            "information in the database."
         )
 
 
@@ -300,7 +243,9 @@ if page == "🏠 Dashboard":
 
 elif page == "👩 Participants":
 
-    st.title("👩 Participants")
+    st.title(
+        "👩 Participants"
+    )
 
     st.write(
         "Add and manage women participating in the awareness program."
@@ -315,13 +260,16 @@ elif page == "👩 Participants":
         ]
     )
 
+
     # --------------------------------------------------------
     # ADD PARTICIPANT
     # --------------------------------------------------------
 
     with tab1:
 
-        with st.form("participant_form"):
+        with st.form(
+            "participant_form"
+        ):
 
             name = st.text_input(
                 "👩 Participant Name"
@@ -358,10 +306,18 @@ elif page == "👩 Participants":
                 else:
 
                     data = {
-                        "name": name.strip(),
-                        "age": int(age),
-                        "phone": phone.strip(),
-                        "group_name": group_name.strip()
+
+                        "name":
+                            name.strip(),
+
+                        "age":
+                            int(age),
+
+                        "phone":
+                            phone.strip(),
+
+                        "group_name":
+                            group_name.strip()
                     }
 
                     if add_record(
@@ -375,8 +331,9 @@ elif page == "👩 Participants":
 
                         st.rerun()
 
+
     # --------------------------------------------------------
-    # VIEW PARTICIPANTS
+    # PARTICIPANT RECORDS
     # --------------------------------------------------------
 
     with tab2:
@@ -410,11 +367,12 @@ elif page == "👩 Participants":
 
 elif page == "📱 Smartphone Usage":
 
-    st.title("📱 Smartphone Usage")
+    st.title(
+        "📱 Smartphone Usage"
+    )
 
     st.write(
-        "Basic smartphone skills that can help women use "
-        "digital services confidently."
+        "Basic smartphone skills for everyday digital activities."
     )
 
     st.divider()
@@ -423,32 +381,32 @@ elif page == "📱 Smartphone Usage":
 
         "📞 Making a Call":
             "Open the Phone app → select a contact or enter "
-            "a number → press the call button → speak clearly → "
+            "a number → press the Call button → talk → "
             "press the red button to end the call.",
 
         "👥 Saving Contacts":
-            "Open Contacts → select Add Contact → enter name "
-            "and phone number → save the contact.",
+            "Open Contacts → Add Contact → enter name and "
+            "phone number → press Save.",
 
-        "💬 Sending WhatsApp Messages":
-            "Open WhatsApp → select a contact → type your message "
-            "→ press Send.",
+        "💬 WhatsApp":
+            "Open WhatsApp → select a contact → type your "
+            "message → press Send.",
 
-        "📷 Using Camera":
-            "Open Camera → point the camera at the subject → "
-            "press the capture button → open Gallery to view the photo.",
+        "📷 Camera":
+            "Open Camera → point the camera → keep the phone "
+            "steady → press the capture button.",
 
-        "🌐 Using Internet":
-            "Open Chrome or another browser → type what you want "
-            "to search → check information from trusted websites.",
+        "🌐 Internet":
+            "Open Chrome → type your search → check information "
+            "from trusted websites.",
 
-        "📧 Using Email":
-            "Open the email application → select Compose → "
-            "enter receiver email → write message → press Send.",
+        "📧 Email":
+            "Open Email → Compose → enter receiver email → "
+            "write message → press Send.",
 
-        "📍 Using Maps":
-            "Open Google Maps → search for a location → "
-            "check directions → follow the route carefully."
+        "📍 Google Maps":
+            "Open Maps → search your destination → select "
+            "Directions → follow the route."
     }
 
     selected_topic = st.selectbox(
@@ -467,10 +425,12 @@ elif page == "📱 Smartphone Usage":
 
 elif page == "📚 Smartphone Guide":
 
-    st.title("📚 Smartphone Guide")
+    st.title(
+        "📚 Smartphone Guide"
+    )
 
     st.write(
-        "Select a topic to see simple step-by-step instructions."
+        "Select one topic to see simple step-by-step instructions."
     )
 
     st.divider()
@@ -478,50 +438,80 @@ elif page == "📚 Smartphone Guide":
     guides = {
 
         "📞 Make a Call": [
+
             "Open the Phone application.",
+
             "Select a saved contact or enter a phone number.",
+
             "Press the green Call button.",
+
             "Talk to the person.",
+
             "Press the red button to end the call."
         ],
 
         "👥 Save a Contact": [
+
             "Open Contacts.",
+
             "Press Add Contact.",
+
             "Enter the person's name.",
+
             "Enter the phone number.",
+
             "Press Save."
         ],
 
         "💬 WhatsApp": [
+
             "Open WhatsApp.",
+
             "Select a contact.",
+
             "Type your message.",
+
             "Check the message before sending.",
+
             "Press Send."
         ],
 
         "📷 Camera": [
+
             "Open Camera.",
+
             "Point the camera toward the object.",
+
             "Keep the phone steady.",
+
             "Press the camera button.",
-            "Open Gallery to see the photo."
+
+            "Open Gallery to view the photo."
         ],
 
         "🌐 Internet Search": [
+
             "Open Chrome or another browser.",
+
             "Type your question in the search box.",
+
             "Read information from trusted websites.",
+
             "Avoid suspicious links.",
+
             "Do not enter personal information on unknown websites."
         ],
 
         "📍 Google Maps": [
+
             "Open Google Maps.",
+
             "Search for your destination.",
+
             "Select Directions.",
-            "Choose walking, car or public transport.",
+
+            "Choose your travel method.",
+
             "Follow the displayed route."
         ]
     }
@@ -551,7 +541,9 @@ elif page == "📚 Smartphone Guide":
 
 elif page == "🛡️ Women Safety":
 
-    st.title("🛡️ Women Online Safety")
+    st.title(
+        "🛡️ Women Online Safety"
+    )
 
     st.write(
         "Select a safety topic to learn practical protection steps."
@@ -562,58 +554,92 @@ elif page == "🛡️ Women Safety":
     safety_topics = {
 
         "🔐 Password Safety": [
+
             "Use a strong password.",
-            "Do not use your name or date of birth as a password.",
+
+            "Do not use your name or date of birth.",
+
             "Use different passwords for important accounts.",
-            "Never share your password with anyone.",
-            "Change your password if you think it has been exposed."
+
+            "Never share your password.",
+
+            "Change your password if it is exposed."
         ],
 
         "🔢 OTP Safety": [
+
             "OTP means One Time Password.",
+
             "Never share OTP with anyone.",
-            "Banks and genuine companies do not need your OTP over a phone call.",
+
+            "Do not provide OTP over phone calls.",
+
             "Do not enter OTP on suspicious websites.",
-            "If you shared an OTP by mistake, contact the service provider immediately."
+
+            "Contact the service provider if you shared an OTP by mistake."
         ],
 
         "💳 UPI & Payment Safety": [
+
             "Never share your UPI PIN.",
+
             "Check the receiver name before payment.",
-            "Remember: entering UPI PIN usually authorizes a payment.",
-            "Do not accept unknown collect requests.",
-            "Contact your bank immediately if you notice an unauthorized transaction."
+
+            "Never enter your PIN because someone asks you to receive money.",
+
+            "Do not accept unknown payment requests.",
+
+            "Contact your bank immediately for unauthorized transactions."
         ],
 
         "🎣 Phishing & Fake Links": [
+
             "Do not click unknown links.",
+
             "Check the website address carefully.",
+
             "Avoid links promising prizes or urgent rewards.",
-            "Never enter passwords or banking details on suspicious websites.",
+
+            "Never enter banking information on suspicious websites.",
+
             "Verify important messages through official channels."
         ],
 
         "📱 Social Media Privacy": [
-            "Keep your social media profile private when appropriate.",
+
+            "Keep your profile private when appropriate.",
+
             "Avoid posting personal information publicly.",
-            "Do not accept requests from unknown people.",
+
+            "Do not accept unknown people.",
+
             "Review privacy settings regularly.",
+
             "Block and report suspicious accounts."
         ],
 
         "🚫 Cyberbullying": [
+
             "Do not respond aggressively.",
+
             "Take screenshots as evidence.",
+
             "Block the person.",
+
             "Report the account or content.",
-            "Tell a trusted person or authority if the situation is serious."
+
+            "Tell a trusted person if the situation is serious."
         ],
 
         "📍 Location Privacy": [
-            "Avoid sharing your live location publicly.",
+
+            "Avoid sharing live location publicly.",
+
             "Check location permissions for apps.",
+
             "Turn off location access when it is not needed.",
-            "Be careful when posting photos that reveal your home or routine."
+
+            "Be careful with photos that reveal your home or routine."
         ]
     }
 
@@ -637,450 +663,14 @@ elif page == "🛡️ Women Safety":
 
 
 # ============================================================
-# SAFETY QUIZ
-# ============================================================
-
-elif page == "📝 Safety Quiz":
-
-    st.title("📝 Online Safety Quiz")
-
-    st.write(
-        "Test your knowledge about smartphone and online safety."
-    )
-
-    st.divider()
-
-    # --------------------------------------------------------
-    # QUESTIONS
-    # --------------------------------------------------------
-
-    quiz_questions = [
-
-        {
-            "question":
-                "Should you share your OTP with another person?",
-            "options":
-                ["Yes", "No"],
-            "answer":
-                "No"
-        },
-
-        {
-            "question":
-                "What should you do before making a UPI payment?",
-            "options":
-                [
-                    "Check receiver name and amount",
-                    "Share your PIN",
-                    "Click any link"
-                ],
-            "answer":
-                "Check receiver name and amount"
-        },
-
-        {
-            "question":
-                "What should you do with a suspicious link?",
-            "options":
-                [
-                    "Click immediately",
-                    "Ignore and verify it",
-                    "Forward it to everyone"
-                ],
-            "answer":
-                "Ignore and verify it"
-        },
-
-        {
-            "question":
-                "Which is a good password practice?",
-            "options":
-                [
-                    "Use your birthday",
-                    "Use the same password everywhere",
-                    "Use a strong unique password"
-                ],
-            "answer":
-                "Use a strong unique password"
-        },
-
-        {
-            "question":
-                "What should you do if someone is cyberbullying you?",
-            "options":
-                [
-                    "Save evidence and report/block",
-                    "Give them your password",
-                    "Share more personal information"
-                ],
-            "answer":
-                "Save evidence and report/block"
-        },
-
-        {
-            "question":
-                "Should your UPI PIN be shared with anyone?",
-            "options":
-                [
-                    "Yes",
-                    "No"
-                ],
-            "answer":
-                "No"
-        },
-
-        {
-            "question":
-                "What is safer when using social media?",
-            "options":
-                [
-                    "Share everything publicly",
-                    "Use privacy settings",
-                    "Accept every unknown person"
-                ],
-            "answer":
-                "Use privacy settings"
-        },
-
-        {
-            "question":
-                "What should you do if you receive a suspicious banking message?",
-            "options":
-                [
-                    "Click its link",
-                    "Verify through the official bank channel",
-                    "Share your OTP"
-                ],
-            "answer":
-                "Verify through the official bank channel"
-        }
-    ]
-
-    # --------------------------------------------------------
-    # PARTICIPANT SELECTION
-    # --------------------------------------------------------
-
-    if not participants:
-
-        st.warning(
-            "⚠️ Please add at least one participant before taking the quiz."
-        )
-
-    else:
-
-        participants_df = pd.DataFrame(
-            participants
-        )
-
-        participant_options = {
-            f"{row['participant_id']} - {row['name']}":
-            row["participant_id"]
-            for _, row in participants_df.iterrows()
-        }
-
-        # ----------------------------------------------------
-        # BEFORE QUIZ
-        # ----------------------------------------------------
-
-        if not st.session_state.quiz_started:
-
-            selected_participant = st.selectbox(
-                "👩 Select Participant",
-                list(participant_options.keys())
-            )
-
-            if st.button(
-                "▶️ Start Quiz",
-                use_container_width=True
-            ):
-
-                st.session_state.quiz_participant_id = (
-                    participant_options[selected_participant]
-                )
-
-                st.session_state.quiz_participant_name = (
-                    selected_participant.split(" - ", 1)[1]
-                )
-
-                st.session_state.quiz_started = True
-                st.session_state.quiz_current = 0
-                st.session_state.quiz_answers = {}
-                st.session_state.quiz_finished = False
-                st.session_state.quiz_score = 0
-
-                st.rerun()
-
-        # ----------------------------------------------------
-        # QUIZ FINISHED
-        # ----------------------------------------------------
-
-        elif st.session_state.quiz_finished:
-
-            st.success(
-                "🎉 Quiz completed successfully!"
-            )
-
-            st.subheader(
-                f"Participant: {st.session_state.quiz_participant_name}"
-            )
-
-            score = st.session_state.quiz_score
-
-            total = len(
-                quiz_questions
-            )
-
-            percentage = (
-                score / total
-            ) * 100
-
-            col1, col2, col3 = st.columns(3)
-
-            with col1:
-
-                st.metric(
-                    "Score",
-                    f"{score}/{total}"
-                )
-
-            with col2:
-
-                st.metric(
-                    "Percentage",
-                    f"{percentage:.1f}%"
-                )
-
-            with col3:
-
-                if percentage >= 60:
-                    result = "Passed"
-                else:
-                    result = "Needs Improvement"
-
-                st.metric(
-                    "Result",
-                    result
-                )
-
-            if st.button(
-                "🔄 Take Quiz Again",
-                use_container_width=True
-            ):
-
-                st.session_state.quiz_started = False
-                st.session_state.quiz_current = 0
-                st.session_state.quiz_answers = {}
-                st.session_state.quiz_finished = False
-                st.session_state.quiz_score = 0
-                st.rerun()
-
-        # ----------------------------------------------------
-        # ACTIVE QUIZ
-        # ----------------------------------------------------
-
-        else:
-
-            current = st.session_state.quiz_current
-
-            question_data = quiz_questions[current]
-
-            st.info(
-                f"👩 Participant: "
-                f"{st.session_state.quiz_participant_name}"
-            )
-
-            st.progress(
-                (current + 1) /
-                len(quiz_questions)
-            )
-
-            st.subheader(
-                f"Question {current + 1} of {len(quiz_questions)}"
-            )
-
-            st.write(
-                f"### {question_data['question']}"
-            )
-
-            previous_answer = (
-                st.session_state.quiz_answers.get(
-                    current
-                )
-            )
-
-            if previous_answer:
-
-                default_index = (
-                    question_data["options"].index(
-                        previous_answer
-                    )
-                )
-
-            else:
-
-                default_index = 0
-
-            selected_answer = st.radio(
-                "Select your answer:",
-                question_data["options"],
-                index=default_index,
-                key=f"question_{current}"
-            )
-
-            col1, col2 = st.columns(2)
-
-            with col1:
-
-                if current > 0:
-
-                    if st.button(
-                        "⬅️ Previous",
-                        use_container_width=True
-                    ):
-
-                        st.session_state.quiz_answers[
-                            current
-                        ] = selected_answer
-
-                        st.session_state.quiz_current -= 1
-
-                        st.rerun()
-
-            with col2:
-
-                if current < len(quiz_questions) - 1:
-
-                    if st.button(
-                        "Next ➡️",
-                        use_container_width=True
-                    ):
-
-                        st.session_state.quiz_answers[
-                            current
-                        ] = selected_answer
-
-                        st.session_state.quiz_current += 1
-
-                        st.rerun()
-
-                else:
-
-                    if st.button(
-                        "✅ Submit Quiz",
-                        use_container_width=True
-                    ):
-
-                        st.session_state.quiz_answers[
-                            current
-                        ] = selected_answer
-
-                        score = 0
-
-                        answer_data = {}
-
-                        for index, question in enumerate(
-                            quiz_questions
-                        ):
-
-                            user_answer = (
-                                st.session_state.quiz_answers.get(
-                                    index,
-                                    ""
-                                )
-                            )
-
-                            correct_answer = (
-                                question["answer"]
-                            )
-
-                            if user_answer == correct_answer:
-
-                                score += 1
-
-                            answer_data[str(index + 1)] = {
-                                "question":
-                                    question["question"],
-                                "selected_answer":
-                                    user_answer,
-                                "correct_answer":
-                                    correct_answer
-                            }
-
-                        # ------------------------------------
-                        # SAVE QUIZ RESULT
-                        # ------------------------------------
-
-                        quiz_data = {
-
-                            "participant_id":
-                                int(
-                                    st.session_state.quiz_participant_id
-                                ),
-
-                            "score":
-                                int(score),
-
-                            "total_questions":
-                                int(
-                                    len(quiz_questions)
-                                ),
-
-                            "answers":
-                                answer_data,
-
-                            "completed_at":
-                                datetime.now().isoformat()
-                        }
-
-                        try:
-
-                            response = (
-                                supabase
-                                .table("quiz_results")
-                                .insert(quiz_data)
-                                .execute()
-                            )
-
-                            if response.data:
-
-                                st.session_state.quiz_score = score
-
-                                st.session_state.quiz_finished = True
-
-                                st.success(
-                                    "✅ Quiz result saved successfully!"
-                                )
-
-                                st.rerun()
-
-                            else:
-
-                                st.error(
-                                    "❌ Quiz result was not saved."
-                                )
-
-                        except Exception as e:
-
-                            st.error(
-                                "❌ Database error while saving quiz."
-                            )
-
-                            st.code(
-                                str(e)
-                            )
-
-                            st.info(
-                                "Check quiz_results table and Supabase RLS policies."
-                            )
-
-
-# ============================================================
 # SAFETY RECORDS
 # ============================================================
 
 elif page == "🚨 Safety Records":
 
-    st.title("🚨 Online Safety Records")
+    st.title(
+        "🚨 Online Safety Records"
+    )
 
     st.write(
         "Record online safety concerns reported by participants."
@@ -1111,8 +701,9 @@ elif page == "🚨 Safety Records":
             ]
         )
 
+
         # ----------------------------------------------------
-        # RECORD EVENT
+        # RECORD SAFETY EVENT
         # ----------------------------------------------------
 
         with tab1:
@@ -1155,13 +746,11 @@ elif page == "🚨 Safety Records":
                 )
 
                 description = st.text_area(
-                    "📝 What happened?",
-                    placeholder="Enter a short description..."
+                    "📝 What happened?"
                 )
 
                 action_taken = st.text_area(
-                    "✅ Action Taken",
-                    placeholder="Enter what action was taken..."
+                    "✅ Action Taken"
                 )
 
                 reported = st.selectbox(
@@ -1211,6 +800,9 @@ elif page == "🚨 Safety Records":
                             "✅ Safety record saved successfully!"
                         )
 
+                        st.rerun()
+
+
         # ----------------------------------------------------
         # VIEW RECORDS
         # ----------------------------------------------------
@@ -1246,7 +838,9 @@ elif page == "🚨 Safety Records":
 
 elif page == "☎️ Help & Emergency":
 
-    st.title("☎️ Help & Emergency")
+    st.title(
+        "☎️ Help & Emergency"
+    )
 
     st.write(
         "Important emergency and cybercrime assistance numbers."
@@ -1291,7 +885,7 @@ elif page == "☎️ Help & Emergency":
 
         "Block suspicious accounts or numbers.",
 
-        "Contact your bank immediately for unauthorized financial transactions.",
+        "Contact your bank for unauthorized financial transactions.",
 
         "Report cybercrime through the appropriate official channel.",
 
@@ -1314,29 +908,34 @@ elif page == "☎️ Help & Emergency":
 
 elif page == "🎓 Training Sessions":
 
-    st.title("🎓 Training Sessions")
+    st.title(
+        "🎓 Training Sessions"
+    )
 
     st.write(
-        "Record smartphone and online safety awareness sessions."
+        "Add awareness training sessions and store their "
+        "information in the Supabase database."
     )
 
     st.divider()
 
     tab1, tab2 = st.tabs(
         [
-            "➕ Add Session",
-            "📋 Session Records"
+            "➕ Add Training Session",
+            "📋 Training Records"
         ]
     )
 
-    # --------------------------------------------------------
-    # ADD SESSION
-    # --------------------------------------------------------
+
+    # ========================================================
+    # ADD TRAINING
+    # ========================================================
 
     with tab1:
 
         with st.form(
-            "training_form"
+            "training_form",
+            clear_on_submit=True
         ):
 
             session_date = st.date_input(
@@ -1347,10 +946,12 @@ elif page == "🎓 Training Sessions":
                 "📚 Training Topic",
                 [
                     "Basic Smartphone Usage",
+                    "Making Calls & Saving Contacts",
                     "WhatsApp Safety",
+                    "Internet Usage",
                     "Password Safety",
                     "OTP Safety",
-                    "UPI Safety",
+                    "UPI & Payment Safety",
                     "Social Media Safety",
                     "Phishing Awareness",
                     "Cybercrime Awareness"
@@ -1364,11 +965,13 @@ elif page == "🎓 Training Sessions":
             participants_count = st.number_input(
                 "👩 Number of Participants",
                 min_value=1,
-                value=1
+                value=1,
+                step=1
             )
 
             notes = st.text_area(
-                "📝 Notes"
+                "📝 Training Notes",
+                placeholder="Enter details about the training session..."
             )
 
             submitted = st.form_submit_button(
@@ -1378,38 +981,69 @@ elif page == "🎓 Training Sessions":
 
             if submitted:
 
-                data = {
+                if trainer.strip() == "":
 
-                    "session_date":
-                        str(session_date),
-
-                    "topic":
-                        topic,
-
-                    "trainer":
-                        trainer,
-
-                    "participants_count":
-                        int(
-                            participants_count
-                        ),
-
-                    "notes":
-                        notes
-                }
-
-                if add_record(
-                    "training_sessions",
-                    data
-                ):
-
-                    st.success(
-                        "✅ Training session saved!"
+                    st.error(
+                        "Please enter trainer name."
                     )
 
-    # --------------------------------------------------------
-    # VIEW SESSIONS
-    # --------------------------------------------------------
+                else:
+
+                    training_data = {
+
+                        "session_date":
+                            str(session_date),
+
+                        "topic":
+                            topic,
+
+                        "trainer":
+                            trainer.strip(),
+
+                        "participants_count":
+                            int(participants_count),
+
+                        "notes":
+                            notes.strip()
+                    }
+
+                    try:
+
+                        response = (
+                            supabase
+                            .table("training_sessions")
+                            .insert(training_data)
+                            .execute()
+                        )
+
+                        if response.data:
+
+                            st.success(
+                                "✅ Training session saved successfully in database!"
+                            )
+
+                            st.rerun()
+
+                        else:
+
+                            st.error(
+                                "❌ Training session could not be saved."
+                            )
+
+                    except Exception as e:
+
+                        st.error(
+                            "❌ Database error while saving training session."
+                        )
+
+                        st.code(
+                            str(e)
+                        )
+
+
+    # ========================================================
+    # VIEW TRAINING RECORDS
+    # ========================================================
 
     with tab2:
 
@@ -1429,6 +1063,10 @@ elif page == "🎓 Training Sessions":
                 training_sessions
             )
 
+            st.success(
+                f"✅ {len(training_df)} training session(s) found in database."
+            )
+
             st.dataframe(
                 training_df,
                 use_container_width=True,
@@ -1442,10 +1080,12 @@ elif page == "🎓 Training Sessions":
 
 elif page == "📊 Reports":
 
-    st.title("📊 Reports & Analysis")
+    st.title(
+        "📊 Reports & Analysis"
+    )
 
     st.write(
-        "View participant quiz performance and safety records."
+        "View participant, safety and training information."
     )
 
     st.divider()
@@ -1454,97 +1094,92 @@ elif page == "📊 Reports":
         "participants"
     )
 
-    quiz_results = get_table(
-        "quiz_results"
-    )
-
     safety_events = get_table(
         "safety_events"
     )
 
-    # --------------------------------------------------------
-    # QUIZ REPORT
-    # --------------------------------------------------------
-
-    st.subheader(
-        "📝 Quiz Performance"
+    training_sessions = get_table(
+        "training_sessions"
     )
 
-    if not quiz_results:
+
+    # --------------------------------------------------------
+    # SUMMARY
+    # --------------------------------------------------------
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+
+        st.metric(
+            "👩 Total Participants",
+            len(participants)
+        )
+
+    with col2:
+
+        st.metric(
+            "🚨 Safety Events",
+            len(safety_events)
+        )
+
+    with col3:
+
+        st.metric(
+            "🎓 Training Sessions",
+            len(training_sessions)
+        )
+
+
+    st.divider()
+
+
+    # ========================================================
+    # TRAINING REPORT
+    # ========================================================
+
+    st.subheader(
+        "🎓 Training Session Report"
+    )
+
+    if not training_sessions:
 
         st.info(
-            "No quiz results available yet."
+            "No training data available."
         )
 
     else:
 
-        quiz_df = pd.DataFrame(
-            quiz_results
+        training_df = pd.DataFrame(
+            training_sessions
         )
 
-        participant_names = {
-
-            p.get("participant_id"):
-                p.get("name", "Unknown")
-
-            for p in participants
-        }
-
-        if "participant_id" in quiz_df.columns:
-
-            quiz_df["Participant Name"] = (
-                quiz_df["participant_id"]
-                .map(participant_names)
-            )
-
-        show_columns = []
-
-        for col in [
-
-            "quiz_id",
-            "Participant Name",
-            "participant_id",
-            "score",
-            "total_questions",
-            "completed_at"
-
-        ]:
-
-            if col in quiz_df.columns:
-
-                show_columns.append(
-                    col
-                )
-
         st.dataframe(
-            quiz_df[
-                show_columns
-            ],
+            training_df,
             use_container_width=True,
             hide_index=True
         )
 
-        # ----------------------------------------------------
-        # SCORE CHART
-        # ----------------------------------------------------
+        if "topic" in training_df.columns:
 
-        if (
-            "score" in quiz_df.columns
-            and "participant_id" in quiz_df.columns
-        ):
-
-            chart_df = quiz_df.copy()
-
-            chart_df["Participant"] = (
-                chart_df["participant_id"]
-                .map(participant_names)
+            topic_count = (
+                training_df[
+                    "topic"
+                ]
+                .value_counts()
+                .reset_index()
             )
 
+            topic_count.columns = [
+                "Training Topic",
+                "Sessions"
+            ]
+
             fig = px.bar(
-                chart_df,
-                x="Participant",
-                y="score",
-                title="Quiz Scores"
+                topic_count,
+                x="Training Topic",
+                y="Sessions",
+                title="Training Sessions by Topic"
             )
 
             st.plotly_chart(
@@ -1552,11 +1187,13 @@ elif page == "📊 Reports":
                 use_container_width=True
             )
 
+
     st.divider()
 
-    # --------------------------------------------------------
+
+    # ========================================================
     # SAFETY REPORT
-    # --------------------------------------------------------
+    # ========================================================
 
     st.subheader(
         "🚨 Safety Event Report"
@@ -1565,7 +1202,7 @@ elif page == "📊 Reports":
     if not safety_events:
 
         st.info(
-            "No safety events available yet."
+            "No safety event data available."
         )
 
     else:
@@ -1573,13 +1210,6 @@ elif page == "📊 Reports":
         safety_df = pd.DataFrame(
             safety_events
         )
-
-        if "participant_id" in safety_df.columns:
-
-            safety_df["Participant Name"] = (
-                safety_df["participant_id"]
-                .map(participant_names)
-            )
 
         st.dataframe(
             safety_df,
