@@ -1,4 +1,4 @@
-
+```python
 import streamlit as st
 from supabase import create_client
 import pandas as pd
@@ -98,13 +98,6 @@ st.markdown(
         font-weight: bold;
     }
 
-    .section-title {
-        font-size: 30px;
-        font-weight: bold;
-        margin-top: 20px;
-        margin-bottom: 20px;
-    }
-
     </style>
     """,
     unsafe_allow_html=True
@@ -153,7 +146,7 @@ else:
 
 
 # ============================================================
-# HOME PAGE
+# HOME
 # ============================================================
 
 if page == "🏠 Home":
@@ -174,7 +167,7 @@ if page == "🏠 Home":
         unsafe_allow_html=True
     )
 
-    st.title("Welcome to Digital Saheli 👋")
+    st.title("Welcome 👋")
 
     st.write(
         """
@@ -194,8 +187,8 @@ if page == "🏠 Home":
             <div class="card">
                 <h2>📱 Learn</h2>
                 <p>
-                Learn basic smartphone, internet,
-                WhatsApp and digital payment usage.
+                Learn smartphone, internet, WhatsApp
+                and digital payment usage.
                 </p>
             </div>
             """,
@@ -208,8 +201,8 @@ if page == "🏠 Home":
             <div class="card">
                 <h2>🛡️ Protect</h2>
                 <p>
-                Learn about passwords, OTP,
-                UPI, privacy and online scams.
+                Learn about passwords, OTP, UPI,
+                privacy and online scams.
                 </p>
             </div>
             """,
@@ -263,7 +256,7 @@ elif page == "📱 Smartphone Usage":
     smartphone_topics = {
 
         "📞 Calls & Contacts": [
-            "Make and receive phone calls.",
+            "Make and receive calls.",
             "Save a new contact.",
             "Search for a saved contact.",
             "Block an unwanted number.",
@@ -330,21 +323,20 @@ elif page == "🛡️ Online Safety":
 
         "🔐 Password Safety":
             """
-            Create strong passwords using a combination of letters,
-            numbers and symbols. Avoid using your name, mobile number
-            or simple passwords.
+            Create strong passwords using letters, numbers and symbols.
+            Avoid using your name, mobile number or simple passwords.
             """,
 
         "🔑 OTP Safety":
             """
-            OTP is private information. Banks, payment services and
-            genuine support staff should not ask you to disclose your OTP.
+            OTP is private information. Never share your OTP with
+            callers, strangers or anyone claiming to provide support.
             """,
 
         "💳 UPI Safety":
             """
             Never share your UPI PIN. Always verify the receiver before
-            sending money. Be careful with unknown payment requests.
+            sending money and be careful with unknown payment requests.
             """,
 
         "🔒 Privacy":
@@ -482,7 +474,7 @@ elif page == "👩 Women Safety":
 
 
 # ============================================================
-# REPORT INCIDENT
+# REPORT AN INCIDENT
 # ============================================================
 
 elif page == "📝 Report an Incident":
@@ -491,9 +483,9 @@ elif page == "📝 Report an Incident":
 
     st.info(
         """
-        This form stores an awareness/report record in the project
-        database. For an official cybercrime complaint, use the
-        National Cyber Crime Reporting Portal.
+        This form saves an incident record in the project database.
+        For an official cybercrime complaint, use the government
+        Cyber Crime Reporting Portal.
         """
     )
 
@@ -585,15 +577,16 @@ elif page == "📝 Report an Incident":
 
     st.write(
         """
-        If you want to make an official cybercrime complaint,
-        use the Government of India's National Cyber Crime
-        Reporting Portal.
+        For an official cybercrime complaint, use the
+        National Cyber Crime Reporting Portal.
         """
     )
 
     st.link_button(
-        "🌐 Report Cyber Crime Online",
-        "https://www.cybercrime.gov.in/"
+        "🌐 REPORT CYBER CRIME ONLINE",
+        "https://www.cybercrime.gov.in/",
+        type="primary",
+        use_container_width=True
     )
 
 
@@ -606,77 +599,121 @@ elif page == "🆘 Help & Helplines":
     st.title("🆘 Help & Helplines")
 
     st.write(
-        "Use the appropriate official service depending on the situation."
-    )
-
-    col1, col2, col3 = st.columns(3)
-
-    with col1:
-
-        st.markdown(
-            """
-            <div class="help-card">
-                <div class="number">🚨 112</div>
-                <h3>Emergency</h3>
-                <p>Emergency assistance.</p>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-
-        st.link_button(
-            "📞 Call 112",
-            "tel:112"
-        )
-
-    with col2:
-
-        st.markdown(
-            """
-            <div class="help-card">
-                <div class="number">👩 181</div>
-                <h3>Women Helpline</h3>
-                <p>Women-related support.</p>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-
-        st.link_button(
-            "📞 Call 181",
-            "tel:181"
-        )
-
-    with col3:
-
-        st.markdown(
-            """
-            <div class="help-card">
-                <div class="number">💻 1930</div>
-                <h3>Cyber Crime</h3>
-                <p>Cyber/financial fraud reporting.</p>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-
-        st.link_button(
-            "📞 Call 1930",
-            "tel:1930"
-        )
-
-    st.divider()
-
-    st.subheader("🌐 Official Cybercrime Reporting")
-
-    st.link_button(
-        "Report Cyber Crime",
-        "https://www.cybercrime.gov.in/"
+        "Tap a call button on a smartphone to open the phone dialer."
     )
 
     st.info(
-        "Keep screenshots, transaction information and other relevant "
-        "evidence available when reporting an incident."
+        "📱 Call buttons work on supported smartphones. "
+        "A laptop/desktop cannot place a normal mobile phone call."
+    )
+
+    # --------------------------------------------------------
+    # 112 EMERGENCY
+    # --------------------------------------------------------
+
+    st.markdown(
+        """
+        <div class="help-card">
+            <div class="number">🚨 112</div>
+            <h2>Emergency Helpline</h2>
+            <p>
+            For immediate emergency assistance.
+            </p>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    st.link_button(
+        "📞 CALL 112",
+        "tel:112",
+        type="primary",
+        use_container_width=True
+    )
+
+    st.divider()
+
+    # --------------------------------------------------------
+    # 181 WOMEN HELPLINE
+    # --------------------------------------------------------
+
+    st.markdown(
+        """
+        <div class="help-card">
+            <div class="number">👩 181</div>
+            <h2>Women Helpline</h2>
+            <p>
+            Women-related support and assistance.
+            </p>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    st.link_button(
+        "📞 CALL WOMEN HELPLINE - 181",
+        "tel:181",
+        type="primary",
+        use_container_width=True
+    )
+
+    st.divider()
+
+    # --------------------------------------------------------
+    # 1930 CYBER CRIME
+    # --------------------------------------------------------
+
+    st.markdown(
+        """
+        <div class="help-card">
+            <div class="number">💻 1930</div>
+            <h2>Cyber Crime Helpline</h2>
+            <p>
+            For cybercrime and financial cyber fraud reporting.
+            </p>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    st.link_button(
+        "📞 CALL CYBER CRIME - 1930",
+        "tel:1930",
+        type="primary",
+        use_container_width=True
+    )
+
+    st.divider()
+
+    # --------------------------------------------------------
+    # OFFICIAL ONLINE REPORT
+    # --------------------------------------------------------
+
+    st.subheader("💻 Official Cyber Crime Reporting")
+
+    st.write(
+        """
+        To make an official cybercrime complaint online,
+        use the National Cyber Crime Reporting Portal.
+        """
+    )
+
+    st.link_button(
+        "🌐 REPORT CYBER CRIME ONLINE",
+        "https://www.cybercrime.gov.in/",
+        type="primary",
+        use_container_width=True
+    )
+
+    st.divider()
+
+    st.warning(
+        """
+        ⚠️ In an immediate emergency, call 112.
+
+        ⚠️ For cyber/financial fraud, contact 1930
+        and use the official cybercrime reporting portal.
+        """
     )
 
 
@@ -1078,10 +1115,6 @@ elif page == "📊 Dashboard":
 
             st.divider()
 
-            # ------------------------------------------------
-            # PARTICIPANTS
-            # ------------------------------------------------
-
             st.subheader(
                 "👩 Participant Records"
             )
@@ -1103,10 +1136,6 @@ elif page == "📊 Dashboard":
                     "No participants registered yet."
                 )
 
-            # ------------------------------------------------
-            # REPORTS
-            # ------------------------------------------------
-
             st.subheader(
                 "📝 Incident Reports"
             )
@@ -1127,10 +1156,6 @@ elif page == "📊 Dashboard":
                 st.info(
                     "No incident reports submitted yet."
                 )
-
-            # ------------------------------------------------
-            # QUIZ RESULTS
-            # ------------------------------------------------
 
             st.subheader(
                 "🧠 Quiz Results"
@@ -1172,14 +1197,14 @@ st.markdown(
     """
     <div style="text-align:center;">
         <p>
-        🌸 <b>Digital Saheli</b> |
-        Smartphone Usage & Online Safety
+        🌸 <b>Digital Saheli</b>
         </p>
         <p>
-        Made for Women Self Help Group Awareness
+        Smartphone Usage & Online Safety
+        for Women Self Help Groups
         </p>
     </div>
     """,
     unsafe_allow_html=True
 )
-
+```
