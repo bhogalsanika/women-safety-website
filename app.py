@@ -1,4 +1,4 @@
-```python
+
 import streamlit as st
 from supabase import create_client
 import pandas as pd
@@ -1182,4 +1182,4 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
-```
+
