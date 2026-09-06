@@ -1,113 +1,135 @@
-```python
+
 import streamlit as st
-from supabase import create_client, Client
-from datetime import datetime
+from supabase import create_client
 import pandas as pd
+from datetime import datetime
 
 # ============================================================
-# PAGE CONFIG
+# PAGE CONFIGURATION
 # ============================================================
 
 st.set_page_config(
-    page_title="Digital Saheli - Women Safety",
+    page_title="Digital Saheli",
     page_icon="🌸",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
 
 # ============================================================
-# SUPABASE CONNECTION
+# SUPABASE CONFIGURATION
 # ============================================================
 
 SUPABASE_URL = "PASTE_YOUR_SUPABASE_URL_HERE"
 SUPABASE_KEY = "PASTE_YOUR_SUPABASE_ANON_KEY_HERE"
 
+supabase = None
+database_connected = False
+
 try:
-    supabase: Client = create_client(
-        SUPABASE_URL,
-        SUPABASE_KEY
-    )
-    db_connected = True
+    if (
+        SUPABASE_URL != "PASTE_YOUR_SUPABASE_URL_HERE"
+        and SUPABASE_KEY != "PASTE_YOUR_SUPABASE_ANON_KEY_HERE"
+    ):
+        supabase = create_client(
+            SUPABASE_URL,
+            SUPABASE_KEY
+        )
+        database_connected = True
 except Exception:
-    db_connected = False
+    database_connected = False
+
 
 # ============================================================
 # CUSTOM CSS
 # ============================================================
 
-st.markdown("""
-<style>
+st.markdown(
+    """
+    <style>
 
-.main {
-    background-color: #fff8fb;
-}
+    .stApp {
+        background-color: #fff8fb;
+    }
 
-.block-container {
-    padding-top: 2rem;
-}
+    [data-testid="stSidebar"] {
+        background-color: #fff0f6;
+    }
 
-.hero {
-    padding: 35px;
-    border-radius: 20px;
-    background: linear-gradient(135deg, #8e2de2, #ff4b8b);
-    color: white;
-    margin-bottom: 25px;
-}
+    .hero {
+        padding: 45px;
+        border-radius: 25px;
+        background: linear-gradient(
+            135deg,
+            #8e2de2,
+            #ff4b8b
+        );
+        color: white;
+        margin-bottom: 30px;
+    }
 
-.hero h1 {
-    font-size: 42px;
-    margin-bottom: 10px;
-}
+    .hero h1 {
+        font-size: 48px;
+        margin-bottom: 10px;
+    }
 
-.card {
-    padding: 22px;
-    border-radius: 16px;
-    background-color: white;
-    border: 1px solid #eeeeee;
-    margin-bottom: 15px;
-}
+    .hero p {
+        font-size: 19px;
+    }
 
-.small-card {
-    padding: 18px;
-    border-radius: 15px;
-    background-color: #ffffff;
-    border: 1px solid #eeeeee;
-    min-height: 150px;
-}
+    .card {
+        background: white;
+        padding: 25px;
+        border-radius: 18px;
+        border: 1px solid #eeeeee;
+        margin-bottom: 20px;
+    }
 
-.help-card {
-    padding: 20px;
-    border-radius: 16px;
-    background-color: #fff0f5;
-    border: 1px solid #ffd1df;
-    text-align: center;
-}
+    .help-card {
+        background: white;
+        padding: 25px;
+        border-radius: 18px;
+        border: 2px solid #ffd4e4;
+        text-align: center;
+        margin-bottom: 15px;
+    }
 
-.warning {
-    padding: 18px;
-    border-radius: 12px;
-    background-color: #fff4e5;
-    border-left: 5px solid #ff9800;
-}
+    .number {
+        font-size: 35px;
+        font-weight: bold;
+    }
 
-.safe {
-    padding: 18px;
-    border-radius: 12px;
-    background-color: #eafaf0;
-    border-left: 5px solid #28a745;
-}
+    .section-title {
+        font-size: 30px;
+        font-weight: bold;
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
 
-</style>
-""", unsafe_allow_html=True)
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 
 # ============================================================
 # SIDEBAR
 # ============================================================
 
-st.sidebar.title("🌸 Digital Saheli")
-st.sidebar.caption("Smartphone Usage & Online Safety")
+st.sidebar.markdown(
+    """
+    <h1 style="text-align:center;">🌸</h1>
+    <h2 style="text-align:center;">Digital Saheli</h2>
+    <p style="text-align:center;">
+    Women Digital Safety Platform
+    </p>
+    """,
+    unsafe_allow_html=True
+)
+
+st.sidebar.divider()
 
 page = st.sidebar.radio(
-    "Navigation",
+    "📌 Menu",
     [
         "🏠 Home",
         "📱 Smartphone Usage",
@@ -122,67 +144,109 @@ page = st.sidebar.radio(
     ]
 )
 
-if db_connected:
-    st.sidebar.success("Database Connected")
+st.sidebar.divider()
+
+if database_connected:
+    st.sidebar.success("🟢 Database Connected")
 else:
-    st.sidebar.error("Database Not Connected")
+    st.sidebar.warning("🟠 Database Not Connected")
+
 
 # ============================================================
-# HOME
+# HOME PAGE
 # ============================================================
 
 if page == "🏠 Home":
 
-    st.markdown("""
-    <div class="hero">
-        <h1>🌸 Digital Saheli</h1>
-        <p>Smartphone Usage and Online Safety for Women Self Help Groups</p>
-        <p>Learn • Stay Safe • Report • Get Help</p>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown(
+        """
+        <div class="hero">
+            <h1>🌸 Digital Saheli</h1>
+            <p>
+            Smartphone Usage and Online Safety
+            for Women Self Help Groups
+            </p>
+            <p>
+            Learn • Protect • Report • Get Help
+            </p>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
-    st.subheader("Welcome 👋")
+    st.title("Welcome to Digital Saheli 👋")
 
     st.write(
-        "Digital Saheli is an awareness and learning platform designed "
-        "to help women understand smartphone usage, digital payments, "
-        "online safety and cybercrime awareness."
+        """
+        Digital Saheli is an awareness platform designed to help
+        women learn smartphone usage, internet safety, digital
+        payment safety and protection against online fraud.
+        """
     )
+
+    st.divider()
 
     col1, col2, col3 = st.columns(3)
 
     with col1:
-        st.markdown("""
-        <div class="small-card">
-        <h3>📱 Learn</h3>
-        <p>Learn basic smartphone and internet usage.</p>
-        </div>
-        """, unsafe_allow_html=True)
+        st.markdown(
+            """
+            <div class="card">
+                <h2>📱 Learn</h2>
+                <p>
+                Learn basic smartphone, internet,
+                WhatsApp and digital payment usage.
+                </p>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
     with col2:
-        st.markdown("""
-        <div class="small-card">
-        <h3>🛡️ Protect</h3>
-        <p>Learn how to protect your accounts and personal information.</p>
-        </div>
-        """, unsafe_allow_html=True)
+        st.markdown(
+            """
+            <div class="card">
+                <h2>🛡️ Protect</h2>
+                <p>
+                Learn about passwords, OTP,
+                UPI, privacy and online scams.
+                </p>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
     with col3:
-        st.markdown("""
-        <div class="small-card">
-        <h3>🆘 Get Help</h3>
-        <p>Find emergency and cybercrime reporting resources.</p>
-        </div>
-        """, unsafe_allow_html=True)
+        st.markdown(
+            """
+            <div class="card">
+                <h2>🆘 Get Help</h2>
+                <p>
+                Find emergency numbers and
+                cybercrime reporting information.
+                </p>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
     st.divider()
 
-    st.subheader("Important Safety Rule")
+    st.subheader("⭐ Important Safety Rules")
 
-    st.warning(
-        "Never share your OTP, UPI PIN, ATM PIN, password or verification code "
-        "with anyone."
-    )
+    rules = [
+        "Never share your OTP with anyone.",
+        "Never share your UPI PIN.",
+        "Do not click suspicious links.",
+        "Use strong and unique passwords.",
+        "Keep your phone and apps updated.",
+        "Block and report suspicious accounts.",
+        "Verify before making online payments."
+    ]
+
+    for rule in rules:
+        st.write("✅ " + rule)
+
 
 # ============================================================
 # SMARTPHONE USAGE
@@ -192,51 +256,67 @@ elif page == "📱 Smartphone Usage":
 
     st.title("📱 Smartphone Usage")
 
-    topics = {
+    st.write(
+        "Learn the basic smartphone skills required for everyday life."
+    )
+
+    smartphone_topics = {
+
         "📞 Calls & Contacts": [
-            "Make and receive calls.",
-            "Save important contacts.",
-            "Block unknown numbers.",
+            "Make and receive phone calls.",
+            "Save a new contact.",
+            "Search for a saved contact.",
+            "Block an unwanted number.",
             "Use emergency contacts."
         ],
+
         "💬 WhatsApp": [
-            "Send messages and photos.",
-            "Make voice/video calls.",
+            "Send text messages.",
+            "Send photos and documents.",
+            "Make voice and video calls.",
             "Block unwanted contacts.",
-            "Check privacy settings."
+            "Use WhatsApp privacy settings."
         ],
-        "🌐 Internet": [
-            "Use Google Search.",
-            "Identify trusted websites.",
+
+        "🌐 Internet & Google": [
+            "Open a browser.",
+            "Search information using Google.",
+            "Check whether a website is trustworthy.",
             "Avoid suspicious links.",
             "Do not download unknown files."
         ],
+
         "📲 Apps": [
-            "Install apps from trusted stores.",
-            "Check app permissions.",
-            "Keep apps updated.",
-            "Remove apps that are not required."
+            "Install apps from trusted app stores.",
+            "Update applications.",
+            "Remove unwanted applications.",
+            "Check application permissions."
         ],
+
         "⚙️ Phone Settings": [
-            "Use screen lock.",
-            "Manage location settings.",
-            "Control camera and microphone permissions.",
-            "Keep software updated."
+            "Set a screen lock.",
+            "Manage Wi-Fi and mobile data.",
+            "Manage location permissions.",
+            "Manage camera and microphone permissions.",
+            "Update phone software."
         ],
+
         "💳 Digital Payments": [
+            "Use UPI carefully.",
+            "Verify the receiver before sending money.",
             "Never share UPI PIN.",
-            "Verify the receiver before payment.",
             "Do not approve unknown payment requests.",
-            "Check transaction details carefully."
+            "Check transaction details before paying."
         ]
     }
 
-    for title, points in topics.items():
+    for title, information in smartphone_topics.items():
 
         with st.expander(title):
 
-            for point in points:
-                st.write("• " + point)
+            for item in information:
+                st.write("• " + item)
+
 
 # ============================================================
 # ONLINE SAFETY
@@ -246,87 +326,115 @@ elif page == "🛡️ Online Safety":
 
     st.title("🛡️ Online Safety")
 
-    safety_topics = [
-        (
-            "🔐 Strong Password",
-            "Use a long and unique password for important accounts. "
-            "Avoid using your name, birth date or simple numbers."
-        ),
-        (
-            "🔑 OTP Safety",
-            "OTP is private. Never tell your OTP to callers, messages or strangers."
-        ),
-        (
-            "💳 UPI Safety",
-            "A UPI PIN is required to send money. Never enter your UPI PIN "
-            "just because someone asks you to receive money."
-        ),
-        (
-            "🔒 Privacy",
-            "Review privacy settings on WhatsApp and social media. "
-            "Avoid publicly sharing personal information."
-        ),
-        (
-            "🔗 Suspicious Links",
-            "Do not click unknown links received through SMS, WhatsApp, email "
-            "or social media."
-        ),
-        (
-            "📍 Location Safety",
-            "Avoid sharing your live location publicly or with unknown people."
-        )
-    ]
+    safety_topics = {
 
-    for title, description in safety_topics:
+        "🔐 Password Safety":
+            """
+            Create strong passwords using a combination of letters,
+            numbers and symbols. Avoid using your name, mobile number
+            or simple passwords.
+            """,
+
+        "🔑 OTP Safety":
+            """
+            OTP is private information. Banks, payment services and
+            genuine support staff should not ask you to disclose your OTP.
+            """,
+
+        "💳 UPI Safety":
+            """
+            Never share your UPI PIN. Always verify the receiver before
+            sending money. Be careful with unknown payment requests.
+            """,
+
+        "🔒 Privacy":
+            """
+            Check privacy settings on WhatsApp and social media.
+            Avoid publicly sharing personal information.
+            """,
+
+        "🔗 Suspicious Links":
+            """
+            Do not click unknown links received through SMS, email,
+            WhatsApp or social media. Verify the sender first.
+            """,
+
+        "📍 Location Safety":
+            """
+            Avoid publicly sharing your live location.
+            Review location permissions of apps.
+            """,
+
+        "📲 App Permissions":
+            """
+            Give applications only the permissions they actually need.
+            Review permissions regularly.
+            """,
+
+        "🔄 Software Updates":
+            """
+            Keep your smartphone operating system and applications
+            updated to receive security improvements.
+            """
+    }
+
+    for title, information in safety_topics.items():
 
         st.markdown(
             f"""
             <div class="card">
                 <h3>{title}</h3>
-                <p>{description}</p>
+                <p>{information}</p>
             </div>
             """,
             unsafe_allow_html=True
         )
 
+
 # ============================================================
-# SCAMS
+# SCAMS & FRAUD
 # ============================================================
 
 elif page == "🚨 Scams & Fraud":
 
     st.title("🚨 Scams & Fraud Awareness")
 
-    st.info(
-        "Scammers often create urgency or fear to make people share "
-        "personal information or send money."
+    st.warning(
+        "Scammers may create fear, urgency or excitement to make you "
+        "share information or send money."
     )
 
-    scams = {
+    scam_list = {
+
         "📩 Fake KYC Message":
-            "A message says your bank account or SIM will be blocked and asks you to click a link.",
+            "A message says your account will be blocked and asks you to click a link.",
 
         "💼 Fake Job Offer":
-            "Someone promises a job and asks for registration or processing fees.",
+            "Someone offers a job and asks for registration or processing fees.",
 
         "🎁 Lottery Scam":
-            "You receive a message claiming that you won money or a prize.",
+            "A message claims that you have won a prize or large amount of money.",
 
         "💳 UPI Scam":
-            "Someone tricks you into approving a payment request or sharing your UPI PIN.",
+            "Someone tricks you into approving a payment or sharing your UPI PIN.",
 
-        "🔗 Phishing Link":
-            "A fake website tries to collect your password, card details or OTP.",
+        "🔗 Phishing":
+            "A fake website attempts to collect passwords, card details or OTP.",
 
         "👤 Fake Customer Care":
-            "A fake support account asks for remote access, OTP or payment details."
+            "A fake support number asks for OTP, payment or remote access."
     }
 
-    for title, explanation in scams.items():
+    for title, explanation in scam_list.items():
 
         with st.expander(title):
+
             st.write(explanation)
-            st.error("Safety Tip: Stop, verify and do not share confidential information.")
+
+            st.error(
+                "Safety Tip: Stop → Verify → Do not share confidential information."
+            )
+
 
 # ============================================================
 # WOMEN SAFETY
@@ -336,37 +444,42 @@ elif page == "👩 Women Safety":
 
     st.title("👩 Women Online Safety")
 
-    issues = {
+    women_safety = {
+
         "🚫 Online Harassment":
-            "Do not engage with abusive accounts. Block and report them.",
+            "Block and report abusive or unwanted accounts. Save relevant evidence.",
 
-        "👤 Fake Profile":
-            "Check suspicious profiles carefully and avoid sharing personal information.",
+        "👤 Fake Profiles":
+            "Do not share personal information with suspicious profiles.",
 
-        "📸 Photo Misuse":
-            "Avoid sharing sensitive photos publicly. Save evidence if misuse occurs.",
+        "📸 Photo / Video Misuse":
+            "Avoid publicly sharing sensitive photos and save evidence if misuse occurs.",
 
         "👀 Cyberstalking":
-            "Keep accounts private and block people who repeatedly contact or monitor you.",
+            "Review privacy settings, block unwanted users and seek appropriate help.",
 
         "💬 Threatening Messages":
-            "Do not respond with personal information. Save evidence and seek appropriate help.",
+            "Do not share personal information. Preserve messages/screenshots and seek help.",
 
         "🔐 Social Media Privacy":
-            "Review who can see your posts, profile information and stories."
+            "Control who can view your profile, posts, stories and personal information.",
+
+        "📍 Personal Information":
+            "Avoid publicly sharing your address, phone number, routine or live location."
     }
 
-    for title, description in issues.items():
+    for title, information in women_safety.items():
 
         st.markdown(
             f"""
             <div class="card">
                 <h3>{title}</h3>
-                <p>{description}</p>
+                <p>{information}</p>
             </div>
             """,
             unsafe_allow_html=True
         )
+
 
 # ============================================================
 # REPORT INCIDENT
@@ -377,11 +490,14 @@ elif page == "📝 Report an Incident":
     st.title("📝 Report an Incident")
 
     st.info(
-        "You can submit an awareness/report record here. "
-        "For an official cybercrime complaint, use the government portal below."
+        """
+        This form stores an awareness/report record in the project
+        database. For an official cybercrime complaint, use the
+        National Cyber Crime Reporting Portal.
+        """
     )
 
-    with st.form("incident_form"):
+    with st.form("report_form"):
 
         name = st.text_input(
             "Name (Optional)"
@@ -397,6 +513,7 @@ elif page == "📝 Report an Incident":
                 "UPI / Payment Fraud",
                 "Cyberstalking",
                 "Photo / Video Misuse",
+                "Threatening Message",
                 "Other"
             ]
         )
@@ -413,52 +530,72 @@ elif page == "📝 Report an Incident":
             "Contact Information (Optional)"
         )
 
-        submitted = st.form_submit_button(
-            "Submit Report"
+        submit_report = st.form_submit_button(
+            "🚨 Submit Report"
         )
 
-        if submitted:
+    if submit_report:
 
-            if description.strip() == "":
-                st.error("Please describe the problem.")
-            elif not db_connected:
-                st.error("Supabase is not connected.")
-            else:
+        if description.strip() == "":
 
-                try:
+            st.error(
+                "Please describe the problem."
+            )
 
-                    data = {
-                        "name": name,
-                        "category": category,
-                        "description": description,
-                        "incident_date": str(incident_date),
-                        "contact": contact,
-                        "created_at": datetime.now().isoformat()
-                    }
+        elif not database_connected:
 
-                    supabase.table("reports").insert(data).execute()
+            st.error(
+                "Database is not connected. Please check Supabase URL and key."
+            )
 
-                    st.success(
-                        "✅ Report submitted successfully."
-                    )
+        else:
 
-                except Exception as e:
-                    st.error("Unable to submit report.")
-                    st.code(str(e))
+            try:
+
+                report_data = {
+                    "name": name,
+                    "category": category,
+                    "description": description,
+                    "incident_date": str(incident_date),
+                    "contact": contact,
+                    "created_at": datetime.now().isoformat()
+                }
+
+                supabase.table(
+                    "reports"
+                ).insert(
+                    report_data
+                ).execute()
+
+                st.success(
+                    "✅ Your report has been saved successfully."
+                )
+
+            except Exception as error:
+
+                st.error(
+                    "Unable to save report."
+                )
+
+                st.code(str(error))
 
     st.divider()
 
-    st.subheader("Official Cyber Crime Reporting")
+    st.subheader("💻 Official Cyber Crime Complaint")
 
     st.write(
-        "For official cybercrime complaints, use the National Cyber Crime "
-        "Reporting Portal."
+        """
+        If you want to make an official cybercrime complaint,
+        use the Government of India's National Cyber Crime
+        Reporting Portal.
+        """
     )
 
     st.link_button(
-        "💻 Report Cyber Crime Online",
+        "🌐 Report Cyber Crime Online",
         "https://www.cybercrime.gov.in/"
     )
+
 
 # ============================================================
 # HELP & HELPLINES
@@ -466,24 +603,26 @@ elif page == "📝 Report an Incident":
 
 elif page == "🆘 Help & Helplines":
 
-    st.title("🆘 Help & Emergency")
+    st.title("🆘 Help & Helplines")
 
     st.write(
-        "If you are facing an emergency or cyber-related problem, "
-        "contact the appropriate official service."
+        "Use the appropriate official service depending on the situation."
     )
 
     col1, col2, col3 = st.columns(3)
 
     with col1:
 
-        st.markdown("""
-        <div class="help-card">
-        <h2>🚨 112</h2>
-        <h4>Emergency</h4>
-        <p>For immediate emergency assistance.</p>
-        </div>
-        """, unsafe_allow_html=True)
+        st.markdown(
+            """
+            <div class="help-card">
+                <div class="number">🚨 112</div>
+                <h3>Emergency</h3>
+                <p>Emergency assistance.</p>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
         st.link_button(
             "📞 Call 112",
@@ -492,13 +631,16 @@ elif page == "🆘 Help & Helplines":
 
     with col2:
 
-        st.markdown("""
-        <div class="help-card">
-        <h2>👩 181</h2>
-        <h4>Women Helpline</h4>
-        <p>Women-related assistance and support.</p>
-        </div>
-        """, unsafe_allow_html=True)
+        st.markdown(
+            """
+            <div class="help-card">
+                <div class="number">👩 181</div>
+                <h3>Women Helpline</h3>
+                <p>Women-related support.</p>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
         st.link_button(
             "📞 Call 181",
@@ -507,13 +649,16 @@ elif page == "🆘 Help & Helplines":
 
     with col3:
 
-        st.markdown("""
-        <div class="help-card">
-        <h2>💻 1930</h2>
-        <h4>Cyber Crime</h4>
-        <p>Report financial/cyber fraud.</p>
-        </div>
-        """, unsafe_allow_html=True)
+        st.markdown(
+            """
+            <div class="help-card">
+                <div class="number">💻 1930</div>
+                <h3>Cyber Crime</h3>
+                <p>Cyber/financial fraud reporting.</p>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
         st.link_button(
             "📞 Call 1930",
@@ -522,149 +667,210 @@ elif page == "🆘 Help & Helplines":
 
     st.divider()
 
-    st.subheader("Official Reporting")
+    st.subheader("🌐 Official Cybercrime Reporting")
 
     st.link_button(
-        "🌐 National Cyber Crime Reporting Portal",
+        "Report Cyber Crime",
         "https://www.cybercrime.gov.in/"
     )
 
-    st.warning(
-        "In case of financial cyber fraud, report as soon as possible. "
-        "Keep transaction details and relevant evidence available."
+    st.info(
+        "Keep screenshots, transaction information and other relevant "
+        "evidence available when reporting an incident."
     )
 
+
 # ============================================================
-# QUIZ
+# SAFETY QUIZ
 # ============================================================
 
 elif page == "🧠 Safety Quiz":
 
     st.title("🧠 Online Safety Quiz")
 
-    questions = [
-        {
-            "q": "Should you share your OTP with a caller?",
-            "options": ["Yes", "No"],
-            "answer": "No"
-        },
-        {
-            "q": "Should you share your UPI PIN with someone?",
-            "options": ["Yes", "No"],
-            "answer": "No"
-        },
-        {
-            "q": "What should you do with a suspicious link?",
-            "options": ["Click it", "Ignore and verify"],
-            "answer": "Ignore and verify"
-        },
-        {
-            "q": "Should you use the same password everywhere?",
-            "options": ["Yes", "No"],
-            "answer": "No"
-        },
-        {
-            "q": "Is it safe to share your live location publicly?",
-            "options": ["Yes", "No"],
-            "answer": "No"
-        },
-        {
-            "q": "What should you do with an abusive online account?",
-            "options": ["Share personal details", "Block and report"],
-            "answer": "Block and report"
-        },
-        {
-            "q": "Should you verify a payment recipient before sending money?",
-            "options": ["Yes", "No"],
-            "answer": "Yes"
-        },
-        {
-            "q": "Can scammers create fake customer-care numbers?",
-            "options": ["Yes", "No"],
-            "answer": "Yes"
-        },
-        {
-            "q": "Should you install apps from unknown sources?",
-            "options": ["Yes", "No"],
-            "answer": "No"
-        },
-        {
-            "q": "Should you keep your phone software updated?",
-            "options": ["Yes", "No"],
-            "answer": "Yes"
-        }
-    ]
+    st.write(
+        "Test your knowledge about smartphone and online safety."
+    )
 
     participant_name = st.text_input(
         "Participant Name"
     )
 
-    answers = []
+    questions = [
 
-    for i, question in enumerate(questions):
+        {
+            "question": "Should you share your OTP with a caller?",
+            "options": ["Yes", "No"],
+            "answer": "No"
+        },
+
+        {
+            "question": "Should you share your UPI PIN with someone?",
+            "options": ["Yes", "No"],
+            "answer": "No"
+        },
+
+        {
+            "question": "What should you do with a suspicious link?",
+            "options": [
+                "Click it immediately",
+                "Ignore it and verify"
+            ],
+            "answer": "Ignore it and verify"
+        },
+
+        {
+            "question": "Should you use the same password everywhere?",
+            "options": ["Yes", "No"],
+            "answer": "No"
+        },
+
+        {
+            "question": "Should you publicly share your live location?",
+            "options": ["Yes", "No"],
+            "answer": "No"
+        },
+
+        {
+            "question": "What should you do with an abusive account?",
+            "options": [
+                "Share personal information",
+                "Block and report"
+            ],
+            "answer": "Block and report"
+        },
+
+        {
+            "question": "Should you verify the receiver before making a payment?",
+            "options": ["Yes", "No"],
+            "answer": "Yes"
+        },
+
+        {
+            "question": "Can scammers create fake customer-care accounts?",
+            "options": ["Yes", "No"],
+            "answer": "Yes"
+        },
+
+        {
+            "question": "Should you install apps from unknown sources?",
+            "options": ["Yes", "No"],
+            "answer": "No"
+        },
+
+        {
+            "question": "Should you keep your phone software updated?",
+            "options": ["Yes", "No"],
+            "answer": "Yes"
+        }
+    ]
+
+    selected_answers = []
+
+    for number, question in enumerate(
+        questions,
+        start=1
+    ):
 
         st.subheader(
-            f"Q{i + 1}. {question['q']}"
+            f"Q{number}. {question['question']}"
         )
 
         answer = st.radio(
-            "Choose one:",
+            "Select your answer:",
             question["options"],
-            key=f"question_{i}"
+            key=f"quiz_{number}"
         )
 
-        answers.append(answer)
+        selected_answers.append(answer)
 
-    if st.button("Submit Quiz"):
+    if st.button(
+        "📝 Submit Quiz",
+        type="primary"
+    ):
 
         score = 0
 
-        for i in range(len(questions)):
+        for i in range(
+            len(questions)
+        ):
 
-            if answers[i] == questions[i]["answer"]:
+            if (
+                selected_answers[i]
+                == questions[i]["answer"]
+            ):
                 score += 1
 
+        total = len(questions)
+
         percentage = int(
-            (score / len(questions)) * 100
+            (score / total) * 100
         )
 
+        st.divider()
+
         st.success(
-            f"🎉 Your Score: {score}/{len(questions)} ({percentage}%)"
+            f"🎉 Your Score: {score}/{total}"
+        )
+
+        st.metric(
+            "Quiz Percentage",
+            f"{percentage}%"
         )
 
         if percentage >= 80:
-            st.balloons()
-            st.success("Excellent! You have good online safety awareness.")
-        elif percentage >= 50:
-            st.info("Good attempt! Review the safety topics once again.")
-        else:
-            st.warning("Please learn the safety topics and try again.")
 
-        if db_connected and participant_name.strip():
+            st.balloons()
+
+            st.success(
+                "Excellent! You have good online safety awareness."
+            )
+
+        elif percentage >= 50:
+
+            st.info(
+                "Good attempt! Review the safety section once again."
+            )
+
+        else:
+
+            st.warning(
+                "Please review the online safety topics and try again."
+            )
+
+        if (
+            database_connected
+            and participant_name.strip() != ""
+        ):
 
             try:
 
                 quiz_data = {
                     "participant_name": participant_name,
                     "score": score,
-                    "total_questions": len(questions),
+                    "total_questions": total,
                     "percentage": percentage,
                     "created_at": datetime.now().isoformat()
                 }
 
                 supabase.table(
                     "quiz_results"
-                ).insert(quiz_data).execute()
+                ).insert(
+                    quiz_data
+                ).execute()
 
                 st.success(
-                    "Quiz result saved to database."
+                    "✅ Quiz result saved to database."
                 )
 
-            except Exception as e:
+            except Exception as error:
 
                 st.error(
                     "Quiz result could not be saved."
                 )
+
+                st.code(str(error))
+
 
 # ============================================================
 # ADD PARTICIPANT
@@ -673,6 +879,10 @@ elif page == "🧠 Safety Quiz":
 elif page == "👩‍💼 Add Participant":
 
     st.title("👩‍💼 Add Participant")
+
+    st.write(
+        "Register women participating in the awareness program."
+    )
 
     with st.form("participant_form"):
 
@@ -705,45 +915,54 @@ elif page == "👩‍💼 Add Participant":
             ]
         )
 
-        submit = st.form_submit_button(
-            "Add Participant"
+        submit_participant = st.form_submit_button(
+            "➕ Add Participant"
         )
 
-        if submit:
+    if submit_participant:
 
-            if name.strip() == "":
-                st.error("Please enter participant name.")
+        if name.strip() == "":
 
-            elif not db_connected:
-                st.error("Supabase is not connected.")
+            st.error(
+                "Please enter participant name."
+            )
 
-            else:
+        elif not database_connected:
 
-                try:
+            st.error(
+                "Database is not connected."
+            )
 
-                    participant = {
-                        "name": name,
-                        "age_group": age_group,
-                        "shg_name": shg_name,
-                        "smartphone_level": smartphone_level,
-                        "created_at": datetime.now().isoformat()
-                    }
+        else:
 
-                    supabase.table(
-                        "participants"
-                    ).insert(participant).execute()
+            try:
 
-                    st.success(
-                        "✅ Participant added successfully."
-                    )
+                participant_data = {
+                    "name": name,
+                    "age_group": age_group,
+                    "shg_name": shg_name,
+                    "smartphone_level": smartphone_level,
+                    "created_at": datetime.now().isoformat()
+                }
 
-                except Exception as e:
+                supabase.table(
+                    "participants"
+                ).insert(
+                    participant_data
+                ).execute()
 
-                    st.error(
-                        "Could not add participant."
-                    )
+                st.success(
+                    "✅ Participant added successfully."
+                )
 
-                    st.code(str(e))
+            except Exception as error:
+
+                st.error(
+                    "Unable to add participant."
+                )
+
+                st.code(str(error))
+
 
 # ============================================================
 # DASHBOARD
@@ -751,200 +970,216 @@ elif page == "👩‍💼 Add Participant":
 
 elif page == "📊 Dashboard":
 
-    st.title("📊 Awareness Dashboard")
+    st.title("📊 Dashboard")
 
-    if not db_connected:
+    if not database_connected:
 
-        st.error(
-            "Supabase is not connected. Please check your URL and API key."
+        st.warning(
+            "Connect Supabase to view database records."
         )
 
     else:
 
         try:
 
-            participants = supabase.table(
-                "participants"
-            ).select("*").execute().data
+            participants_response = (
+                supabase
+                .table("participants")
+                .select("*")
+                .execute()
+            )
 
-            reports = supabase.table(
-                "reports"
-            ).select("*").execute().data
+            reports_response = (
+                supabase
+                .table("reports")
+                .select("*")
+                .execute()
+            )
 
-            quizzes = supabase.table(
-                "quiz_results"
-            ).select("*").execute().data
+            quiz_response = (
+                supabase
+                .table("quiz_results")
+                .select("*")
+                .execute()
+            )
 
-            p_count = len(participants)
-            r_count = len(reports)
-            q_count = len(quizzes)
+            participants = (
+                participants_response.data
+                or []
+            )
 
-            if q_count > 0:
+            reports = (
+                reports_response.data
+                or []
+            )
+
+            quiz_results = (
+                quiz_response.data
+                or []
+            )
+
+            participant_count = len(
+                participants
+            )
+
+            report_count = len(
+                reports
+            )
+
+            quiz_count = len(
+                quiz_results
+            )
+
+            if quiz_count > 0:
 
                 average_score = sum(
-                    item.get("percentage", 0)
-                    for item in quizzes
-                ) / q_count
+                    int(
+                        item.get(
+                            "percentage",
+                            0
+                        )
+                    )
+                    for item in quiz_results
+                ) / quiz_count
 
             else:
 
                 average_score = 0
 
-            c1, c2, c3, c4 = st.columns(4)
+            col1, col2, col3, col4 = st.columns(4)
 
-            c1.metric(
-                "👩 Participants",
-                p_count
-            )
+            with col1:
 
-            c2.metric(
-                "📝 Reports",
-                r_count
-            )
+                st.metric(
+                    "👩 Participants",
+                    participant_count
+                )
 
-            c3.metric(
-                "🧠 Quizzes",
-                q_count
-            )
+            with col2:
 
-            c4.metric(
-                "📈 Avg Quiz %",
-                f"{average_score:.1f}%"
-            )
+                st.metric(
+                    "📝 Reports",
+                    report_count
+                )
+
+            with col3:
+
+                st.metric(
+                    "🧠 Quizzes",
+                    quiz_count
+                )
+
+            with col4:
+
+                st.metric(
+                    "📈 Average Score",
+                    f"{average_score:.1f}%"
+                )
 
             st.divider()
 
+            # ------------------------------------------------
             # PARTICIPANTS
+            # ------------------------------------------------
 
-            st.subheader("👩 Participant Records")
+            st.subheader(
+                "👩 Participant Records"
+            )
 
             if participants:
 
-                df_participants = pd.DataFrame(
+                participant_df = pd.DataFrame(
                     participants
                 )
 
                 st.dataframe(
-                    df_participants,
+                    participant_df,
                     use_container_width=True
                 )
 
             else:
 
                 st.info(
-                    "No participant records yet."
+                    "No participants registered yet."
                 )
 
+            # ------------------------------------------------
             # REPORTS
+            # ------------------------------------------------
 
-            st.subheader("📝 Incident Reports")
+            st.subheader(
+                "📝 Incident Reports"
+            )
 
             if reports:
 
-                df_reports = pd.DataFrame(
+                reports_df = pd.DataFrame(
                     reports
                 )
 
                 st.dataframe(
-                    df_reports,
+                    reports_df,
                     use_container_width=True
                 )
 
             else:
 
                 st.info(
-                    "No reports submitted yet."
+                    "No incident reports submitted yet."
                 )
 
+            # ------------------------------------------------
             # QUIZ RESULTS
+            # ------------------------------------------------
 
-            st.subheader("🧠 Quiz Results")
+            st.subheader(
+                "🧠 Quiz Results"
+            )
 
-            if quizzes:
+            if quiz_results:
 
-                df_quiz = pd.DataFrame(
-                    quizzes
+                quiz_df = pd.DataFrame(
+                    quiz_results
                 )
 
                 st.dataframe(
-                    df_quiz,
+                    quiz_df,
                     use_container_width=True
                 )
 
             else:
 
                 st.info(
-                    "No quiz results yet."
+                    "No quiz results available yet."
                 )
 
-        except Exception as e:
+        except Exception as error:
 
             st.error(
-                "Unable to load dashboard data."
+                "Unable to load database records."
             )
 
-            st.code(str(e))
-```
+            st.code(str(error))
 
-### 2. Supabase SQL
 
-Supabase → **SQL Editor → New Query** → पूरा code paste करके **Run** करो:
+# ============================================================
+# FOOTER
+# ============================================================
 
-```sql
-create table participants (
-    id bigint generated by default as identity primary key,
-    name text not null,
-    age_group text,
-    shg_name text,
-    smartphone_level text,
-    created_at timestamptz default now()
-);
+st.divider()
 
-create table reports (
-    id bigint generated by default as identity primary key,
-    name text,
-    category text,
-    description text not null,
-    incident_date date,
-    contact text,
-    created_at timestamptz default now()
-);
+st.markdown(
+    """
+    <div style="text-align:center;">
+        <p>
+        🌸 <b>Digital Saheli</b> |
+        Smartphone Usage & Online Safety
+        </p>
+        <p>
+        Made for Women Self Help Group Awareness
+        </p>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
-create table quiz_results (
-    id bigint generated by default as identity primary key,
-    participant_name text,
-    score integer,
-    total_questions integer,
-    percentage integer,
-    created_at timestamptz default now()
-);
-```
-
-### 3. Code mein Supabase details
-
-Is part mein:
-
-```python
-SUPABASE_URL = "PASTE_YOUR_SUPABASE_URL_HERE"
-SUPABASE_KEY = "PASTE_YOUR_SUPABASE_ANON_KEY_HERE"
-```
-
-apna **Supabase Project URL** aur **anon/public key** paste karna.
-
-⚠️ **Service-role/secret key website code mein mat dalna.** Supabase ki public/anon key use karna, aur production app mein Row Level Security (RLS) properly configure karna.
-
-### 4. Required packages
-
-Terminal mein:
-
-```bash
-pip install streamlit supabase pandas
-```
-
-Phir:
-
-```bash
-streamlit run app.py
-```
-
-**Important:** `Report an Incident` wala form tumhari website ke **database mein record save karega**, jabki official cybercrime complaint ke liye user ko government portal par bhejega. Is distinction ko mam ko explain karna—tumhari website khud police/cybercrime complaint authority nahi hai.
