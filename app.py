@@ -4,11 +4,11 @@ import pandas as pd
 from datetime import datetime
 
 # ============================================================
-# PAGE CONFIG
+# PAGE CONFIGURATION
 # ============================================================
 
 st.set_page_config(
-    page_title="Digital Saheli - Women Safety",
+    page_title="Digital Saheli",
     page_icon="🌸",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -36,26 +36,27 @@ if SUPABASE_URL and SUPABASE_KEY:
 st.markdown("""
 <style>
 
-.main {
-    background-color: #fff7fb;
+.stApp {
+    background-color: #fff8fb;
 }
 
 .block-container {
     padding-top: 2rem;
+    padding-bottom: 3rem;
 }
 
 .hero {
-    background: linear-gradient(135deg, #8e245d, #d94f8a);
-    padding: 35px;
-    border-radius: 20px;
+    background: linear-gradient(135deg, #7b1e4d, #d84f8b);
+    padding: 40px;
+    border-radius: 22px;
     color: white;
     text-align: center;
-    margin-bottom: 25px;
+    margin-bottom: 30px;
 }
 
 .hero h1 {
-    font-size: 42px;
-    margin-bottom: 8px;
+    font-size: 44px;
+    margin-bottom: 10px;
 }
 
 .hero p {
@@ -65,16 +66,9 @@ st.markdown("""
 .card {
     background: white;
     padding: 22px;
-    border-radius: 15px;
-    margin-bottom: 15px;
-    box-shadow: 0 3px 12px rgba(0,0,0,0.08);
-}
-
-.warning {
-    background: #fff3cd;
-    padding: 18px;
-    border-radius: 12px;
-    border-left: 5px solid #ffb300;
+    border-radius: 16px;
+    margin-bottom: 18px;
+    box-shadow: 0 3px 14px rgba(0,0,0,0.08);
 }
 
 .safe {
@@ -82,6 +76,15 @@ st.markdown("""
     padding: 18px;
     border-radius: 12px;
     border-left: 5px solid #2e9d62;
+    margin: 15px 0;
+}
+
+.warning {
+    background: #fff4d6;
+    padding: 18px;
+    border-radius: 12px;
+    border-left: 5px solid #f0a500;
+    margin: 15px 0;
 }
 
 .danger {
@@ -89,11 +92,7 @@ st.markdown("""
     padding: 18px;
     border-radius: 12px;
     border-left: 5px solid #d93025;
-}
-
-.big-number {
-    font-size: 28px;
-    font-weight: bold;
+    margin: 15px 0;
 }
 
 </style>
@@ -104,11 +103,10 @@ st.markdown("""
 # ============================================================
 
 st.sidebar.title("🌸 Digital Saheli")
-
 st.sidebar.write("Women Safety & Digital Awareness")
 
 page = st.sidebar.radio(
-    "Navigation",
+    "Menu",
     [
         "🏠 Home",
         "📱 Smartphone Guide",
@@ -123,9 +121,10 @@ page = st.sidebar.radio(
 )
 
 st.sidebar.markdown("---")
+
 st.sidebar.info(
-    "Digital Saheli helps women learn safe smartphone usage "
-    "and protect themselves from online scams."
+    "Learn smartphone usage, identify scams, stay safe online "
+    "and know where to report cybercrime."
 )
 
 # ============================================================
@@ -145,8 +144,8 @@ if page == "🏠 Home":
     st.subheader("Welcome to Digital Saheli 👩‍💻")
 
     st.write(
-        "This website helps women understand smartphone usage, "
-        "identify online scams, report cybercrime and stay safe online."
+        "Digital Saheli is an awareness platform designed to help women "
+        "use smartphones confidently and stay safe from online threats and scams."
     )
 
     col1, col2, col3 = st.columns(3)
@@ -154,24 +153,33 @@ if page == "🏠 Home":
     with col1:
         st.markdown("""
         <div class="card">
-        <h3>📱 Learn Smartphone</h3>
-        <p>Learn basic smartphone features, WhatsApp, Maps, UPI and privacy settings.</p>
+            <h3>📱 Smartphone Learning</h3>
+            <p>
+            Learn calls, contacts, WhatsApp, Maps, apps,
+            UPI and privacy settings.
+            </p>
         </div>
         """, unsafe_allow_html=True)
 
     with col2:
         st.markdown("""
         <div class="card">
-        <h3>🚨 Detect Scams</h3>
-        <p>Learn how to identify fake messages, links, calls and payment scams.</p>
+            <h3>🚨 Scam Awareness</h3>
+            <p>
+            Learn how to identify OTP scams,
+            phishing, fake jobs and payment fraud.
+            </p>
         </div>
         """, unsafe_allow_html=True)
 
     with col3:
         st.markdown("""
         <div class="card">
-        <h3>📝 Report Cybercrime</h3>
-        <p>Find official cybercrime reporting options and important helpline numbers.</p>
+            <h3>📝 Report & Get Help</h3>
+            <p>
+            Find cybercrime reporting options
+            and important emergency helplines.
+            </p>
         </div>
         """, unsafe_allow_html=True)
 
@@ -191,6 +199,14 @@ if page == "🏠 Home":
     with c4:
         st.metric("Child Helpline", "1098")
 
+    st.markdown("""
+    <div class="safe">
+        <b>🛡️ Golden Rule:</b>
+        Never share your OTP, UPI PIN, ATM PIN, password or banking
+        information with anyone.
+    </div>
+    """, unsafe_allow_html=True)
+
 # ============================================================
 # SMARTPHONE GUIDE
 # ============================================================
@@ -200,53 +216,60 @@ elif page == "📱 Smartphone Guide":
     st.title("📱 Smartphone Usage Guide")
 
     st.write(
-        "A simple guide to help beginners use smartphones safely and confidently."
+        "Basic smartphone information for women who want to use "
+        "their phones safely and confidently."
     )
 
     topics = {
-        "📞 Making a Phone Call":
-            "Open the Phone app → enter/select the contact → tap the call button.",
+        "📞 How to Make a Call":
+            "Open the Phone application → select a contact or enter a number → tap the Call button.",
 
-        "👤 Save a Contact":
-            "Open Contacts → Add Contact → enter name and number → Save.",
+        "👤 How to Save a Contact":
+            "Open Contacts → tap Add Contact → enter name and phone number → tap Save.",
 
-        "💬 WhatsApp":
-            "Open WhatsApp → select a contact → type your message → Send. "
-            "Do not share OTPs or sensitive information.",
+        "💬 How to Use WhatsApp":
+            "Open WhatsApp → select a contact → type your message → tap Send. "
+            "Never share OTPs or passwords through WhatsApp.",
 
-        "📷 Send Photos":
-            "Open WhatsApp → open a chat → tap attachment/gallery → select photo → Send.",
+        "📷 How to Send a Photo":
+            "Open WhatsApp → open a chat → tap the attachment/gallery icon → select a photo → Send.",
 
-        "📍 Google Maps":
-            "Open Google Maps → search the destination → tap Directions → choose your travel mode.",
+        "📍 How to Use Google Maps":
+            "Open Google Maps → search your destination → tap Directions → select walking, car or other travel mode.",
 
-        "📲 Install an App":
-            "Use the official Google Play Store/App Store. "
-            "Avoid downloading APK files from unknown websites.",
+        "📲 How to Install Apps":
+            "Download applications from the official Google Play Store or Apple App Store. "
+            "Avoid unknown APK files and suspicious websites.",
 
-        "🔐 Screen Lock":
-            "Use a PIN, password or biometric lock. Avoid easy PINs such as 1234.",
+        "🔐 How to Lock Your Phone":
+            "Use a strong PIN, password, fingerprint or face lock to protect your phone.",
 
-        "🔄 Update Apps":
-            "Keep Android/iOS and important applications updated to receive security fixes.",
+        "🔄 Keep Phone Updated":
+            "Install operating-system and application updates regularly because updates often contain security fixes.",
 
         "💳 UPI Safety":
-            "Never share your UPI PIN or OTP. Remember: you normally enter your UPI PIN "
-            "when making a payment, not when receiving money.",
+            "Never share your UPI PIN or OTP. Do not enter your UPI PIN just because someone says they are sending you money.",
 
         "🔒 Privacy Settings":
-            "Check app permissions for camera, microphone, contacts and location. "
-            "Give permissions only when necessary."
+            "Check permissions given to applications. Camera, microphone, contacts and location should only be allowed when necessary.",
+
+        "🌐 Safe Browsing":
+            "Avoid suspicious websites and do not enter passwords or banking information on unknown websites.",
+
+        "📶 Public Wi-Fi":
+            "Avoid accessing sensitive banking services on unknown public Wi-Fi networks."
     }
 
-    for title, explanation in topics.items():
+    for title, information in topics.items():
+
         with st.expander(title):
-            st.write(explanation)
+            st.write(information)
 
     st.markdown("""
-    <div class="safe">
-    <b>✅ Remember:</b><br>
-    Never share your OTP, UPI PIN, ATM PIN, password or banking details with anyone.
+    <div class="warning">
+        <b>⚠️ Important:</b><br>
+        If an unknown person asks for your OTP, UPI PIN,
+        password or remote access to your phone, do not provide it.
     </div>
     """, unsafe_allow_html=True)
 
@@ -256,65 +279,85 @@ elif page == "📱 Smartphone Guide":
 
 elif page == "🚨 Identify Scams":
 
-    st.title("🚨 How to Identify an Online Scam")
+    st.title("🚨 How to Identify Scams")
 
-    st.write("Look for these warning signs before clicking, paying or sharing information.")
+    st.write(
+        "Scammers often create urgency, fear or excitement to make people act quickly."
+    )
 
     scams = [
         (
             "🔐 OTP Scam",
-            "Someone asks for your OTP and says they need it to verify your account.",
-            "Never share OTP with anyone."
+            "Someone calls or messages asking for your OTP.",
+            "Never share your OTP."
         ),
+
         (
             "💳 UPI Scam",
-            "Someone sends a payment request and asks you to enter your UPI PIN to receive money.",
-            "Never enter UPI PIN to receive money."
+            "Someone asks you to enter your UPI PIN to receive money.",
+            "Do not enter your UPI PIN to receive money."
         ),
+
         (
-            "🎁 Prize Scam",
-            "You receive a message saying you won a lottery/prize and must pay a fee.",
-            "Do not pay. It is likely a scam."
+            "🎁 Lottery / Prize Scam",
+            "You are told that you won a prize but must pay a fee first.",
+            "Do not pay the fee."
         ),
+
         (
             "💼 Fake Job Scam",
-            "Someone promises a job but asks for registration or processing fees.",
-            "Verify the company independently."
+            "A person promises a job and asks for registration or processing fees.",
+            "Verify the company independently before paying."
         ),
+
         (
             "🔗 Phishing Link",
-            "A message asks you to urgently click a link to update your bank/account.",
+            "A message asks you to click a link to update KYC, bank or account information.",
             "Do not click suspicious links."
         ),
+
         (
             "📞 Fake Customer Care",
-            "A person pretends to be customer support and asks for OTP, PIN or remote access.",
-            "Use customer-care numbers from official websites/apps."
+            "Someone pretends to be customer support and asks for confidential information.",
+            "Find customer-care information from the official website or app."
         ),
+
         (
             "👮 Digital Arrest Scam",
-            "A caller pretends to be police/government officials and threatens arrest unless money is paid.",
-            "Stay calm. Do not transfer money."
+            "A caller pretends to be a police or government official and threatens you.",
+            "Stay calm and do not transfer money."
         ),
+
         (
-            "📱 Fake Social Media Profile",
-            "Someone creates a profile pretending to be a friend or known person.",
-            "Verify the person through another trusted method."
+            "👤 Fake Social Media Account",
+            "Someone creates a fake account pretending to be you or someone you know.",
+            "Verify the identity and report the fake account."
+        ),
+
+        (
+            "📱 SIM / KYC Scam",
+            "You receive an urgent message saying your SIM or KYC will be blocked.",
+            "Do not click the provided link. Verify through the official provider."
         )
     ]
 
-    for name, description, action in scams:
+    for title, description, action in scams:
+
         st.markdown(f"""
         <div class="card">
-        <h3>{name}</h3>
-        <p><b>⚠️ What happens:</b> {description}</p>
-        <p><b>✅ What to do:</b> {action}</p>
+            <h3>{title}</h3>
+            <p><b>⚠️ Warning sign:</b> {description}</p>
+            <p><b>✅ What to do:</b> {action}</p>
         </div>
         """, unsafe_allow_html=True)
 
-    st.warning(
-        "If a message creates panic or asks you to act immediately, stop and verify it first."
-    )
+    st.markdown("""
+    <div class="danger">
+        <b>🚨 Remember:</b><br>
+        If someone pressures you to act immediately,
+        stop and verify the information before doing anything.
+    </div>
+    """, unsafe_allow_html=True)
 
 # ============================================================
 # SCAM CHECK
@@ -325,33 +368,42 @@ elif page == "🔍 Scam Check":
     st.title("🔍 Scam Check")
 
     st.write(
-        "Use this checklist to decide whether a message, call or offer looks suspicious."
+        "Paste a suspicious message below. The tool checks for common scam warning signs."
     )
 
     message = st.text_area(
-        "Paste the suspicious message here:",
+        "📩 Enter suspicious message",
+        height=150,
         placeholder="Example: Your bank account will be blocked. Click this link immediately..."
     )
 
     suspicious_words = [
         "otp",
         "upi pin",
+        "pin",
         "urgent",
         "verify immediately",
         "account blocked",
+        "account will be blocked",
         "lottery",
         "winner",
         "pay fee",
         "click here",
         "password",
         "kyc",
-        "digital arrest"
+        "digital arrest",
+        "police",
+        "reward",
+        "prize",
+        "refund"
     ]
 
-    if st.button("🔎 Check Message"):
+    if st.button("🔎 Check Message", use_container_width=True):
 
         if not message.strip():
-            st.warning("Please enter a message first.")
+
+            st.warning("Please enter a suspicious message first.")
+
         else:
 
             text = message.lower()
@@ -363,42 +415,50 @@ elif page == "🔍 Scam Check":
 
             if found:
 
-                st.error("⚠️ This message contains possible scam warning signs.")
+                st.error(
+                    "⚠️ Possible scam warning signs detected."
+                )
 
-                st.write("Possible warning signs detected:")
+                st.write("The following warning signs were found:")
 
                 for item in found:
                     st.write("•", item)
 
                 st.markdown("""
                 <div class="danger">
-                <b>Do not:</b><br>
-                ❌ Share OTP<br>
-                ❌ Share UPI PIN<br>
-                ❌ Send money<br>
-                ❌ Click unknown links<br>
-                ❌ Give remote access to your phone
+                    <b>Do NOT:</b><br>
+                    ❌ Share OTP<br>
+                    ❌ Share UPI PIN<br>
+                    ❌ Send money<br>
+                    ❌ Click unknown links<br>
+                    ❌ Share passwords<br>
+                    ❌ Give remote access to your phone
                 </div>
                 """, unsafe_allow_html=True)
 
             else:
 
                 st.success(
-                    "No common scam keywords were detected, but this does NOT guarantee that the message is safe."
+                    "No common scam keywords were detected."
+                )
+
+                st.info(
+                    "This does NOT guarantee that the message is safe. "
+                    "Always verify suspicious messages independently."
                 )
 
     st.markdown("---")
 
-    st.subheader("🔎 Check Official Suspect Repository")
+    st.subheader("🔎 Check Suspicious Information")
 
     st.write(
-        "You can also check suspicious mobile numbers, email IDs, bank accounts "
-        "and website URLs through the Government cybercrime portal."
+        "For official checking and reporting, use the National Cyber Crime Reporting Portal."
     )
 
     st.link_button(
-        "🔎 Open I4C Suspect Repository",
-        "https://cybercrime.gov.in/"
+        "🌐 Open Cyber Crime Portal",
+        "https://cybercrime.gov.in/",
+        use_container_width=True
     )
 
 # ============================================================
@@ -407,54 +467,71 @@ elif page == "🔍 Scam Check":
 
 elif page == "📝 Report Scam":
 
-    st.title("📝 Report Cybercrime / Scam")
+    st.title("📝 Report a Scam / Cybercrime")
 
     st.markdown("""
     <div class="danger">
-    <h3>🚨 Financial Fraud?</h3>
-    <p>Contact <b>1930</b> immediately and report the incident through the official cybercrime portal.</p>
+        <h3>🚨 If money has been lost</h3>
+        <p>
+        Contact <b>1930</b> as soon as possible and report the incident
+        through the official cybercrime portal.
+        </p>
     </div>
     """, unsafe_allow_html=True)
 
-    st.subheader("1️⃣ Report Cyber Crime")
+    st.subheader("🌐 1. Report Cybercrime Online")
 
     st.write(
-        "Use the Government of India's National Cyber Crime Reporting Portal "
-        "to submit a cybercrime complaint."
+        "Use the official National Cyber Crime Reporting Portal "
+        "to register a cybercrime complaint."
     )
 
     st.link_button(
-        "🌐 Report Cyber Crime",
-        "https://cybercrime.gov.in/"
+        "📝 Report Cybercrime",
+        "https://cybercrime.gov.in/",
+        use_container_width=True
     )
 
-    st.subheader("2️⃣ Report a Suspect")
+    st.markdown("---")
+
+    st.subheader("🔎 2. Report / Check a Suspect")
 
     st.write(
-        "The portal also provides options for reporting suspicious "
-        "phone numbers, URLs, email IDs and other identifiers."
+        "The official portal provides facilities related to reporting "
+        "suspicious cybercrime identifiers."
     )
 
     st.link_button(
-        "🔎 Report Suspect",
-        "https://cybercrime.gov.in/"
+        "🔎 Open Cyber Crime Portal",
+        "https://cybercrime.gov.in/",
+        use_container_width=True
     )
 
-    st.subheader("3️⃣ What Information Should You Keep?")
+    st.markdown("---")
 
-    st.write("""
-    • Screenshot of suspicious message  
-    • Phone number / email ID  
-    • Website or message link  
-    • Transaction ID, if money was lost  
-    • Date and time of incident  
-    • Bank/payment details related to the transaction  
-    • Any other evidence
-    """)
+    st.subheader("📋 3. Keep These Details Ready")
 
-    st.warning(
-        "Do not delete important evidence before reporting the incident."
-    )
+    details = [
+        "📸 Screenshots of messages or conversations",
+        "📞 Suspicious phone number",
+        "📧 Suspicious email address",
+        "🔗 Suspicious website or link",
+        "💳 Transaction ID, if money was transferred",
+        "📅 Date and time of incident",
+        "💰 Amount lost, if applicable",
+        "📄 Other relevant evidence"
+    ]
+
+    for item in details:
+        st.write(item)
+
+    st.markdown("""
+    <div class="warning">
+        <b>⚠️ Do not delete evidence.</b><br>
+        Keep screenshots, transaction details and suspicious messages
+        available when making a complaint.
+    </div>
+    """, unsafe_allow_html=True)
 
 # ============================================================
 # HELPLINES
@@ -464,61 +541,109 @@ elif page == "☎️ Helplines":
 
     st.title("☎️ Important Helpline Numbers")
 
+    st.write(
+        "📱 On a mobile phone, tap the Call button to open the phone dialer."
+    )
+
     helplines = [
-        ("1930", "Cyber Crime Helpline", "For cyber financial fraud and cybercrime assistance."),
-        ("112", "Emergency", "For immediate emergency assistance."),
-        ("181", "Women Helpline", "Women-related assistance."),
-        ("1098", "Child Helpline", "For children in need of help."),
-        ("1915", "National Consumer Helpline", "For consumer-related complaints.")
+        (
+            "1930",
+            "Cyber Crime Helpline",
+            "For cybercrime and financial cyber fraud assistance."
+        ),
+
+        (
+            "112",
+            "Emergency Helpline",
+            "For immediate emergency assistance."
+        ),
+
+        (
+            "181",
+            "Women Helpline",
+            "For women-related assistance."
+        ),
+
+        (
+            "1098",
+            "Child Helpline",
+            "For children who need help."
+        ),
+
+        (
+            "1915",
+            "National Consumer Helpline",
+            "For consumer-related complaints."
+        )
     ]
 
     for number, name, description in helplines:
 
         st.markdown(f"""
         <div class="card">
-        <div class="big-number">☎️ {number}</div>
-        <h3>{name}</h3>
-        <p>{description}</p>
+
+            <h2>☎️ {number}</h2>
+
+            <h3>{name}</h3>
+
+            <p>{description}</p>
+
         </div>
         """, unsafe_allow_html=True)
 
-    st.info(
-        "In an immediate emergency, use 112. For cybercrime/financial cyber fraud, use 1930 and the official cybercrime portal."
-    )
+        # DIRECT CALL BUTTON
+        st.link_button(
+            f"📞 Call {number}",
+            f"tel:{number}",
+            use_container_width=True
+        )
+
+        st.markdown("<br>", unsafe_allow_html=True)
+
+    st.markdown("""
+    <div class="warning">
+        <b>🚨 Emergency:</b> Call 112<br><br>
+        <b>💻 Cybercrime / Financial Fraud:</b> Call 1930
+    </div>
+    """, unsafe_allow_html=True)
 
 # ============================================================
-# QUIZ
+# SAFETY QUIZ
 # ============================================================
 
 elif page == "🧠 Safety Quiz":
 
     st.title("🧠 Online Safety Quiz")
 
-    st.write("Test your digital safety knowledge.")
+    st.write(
+        "Test your knowledge about smartphone and online safety."
+    )
 
     questions = [
         {
-            "q": "Someone asks for your OTP. What should you do?",
+            "question": "Someone asks you for your OTP. What should you do?",
             "options": [
                 "Share it",
                 "Never share it",
-                "Send it only if they sound professional",
-                "Post it in chat"
+                "Share it if they sound professional",
+                "Send it by WhatsApp"
             ],
             "answer": "Never share it"
         },
+
         {
-            "q": "You receive a suspicious bank link. What should you do?",
+            "question": "You receive a suspicious bank link. What should you do?",
             "options": [
                 "Click immediately",
-                "Forward it to everyone",
-                "Open the official bank app/website yourself",
+                "Forward it",
+                "Open the official bank app or website yourself",
                 "Enter your password"
             ],
-            "answer": "Open the official bank app/website yourself"
+            "answer": "Open the official bank app or website yourself"
         },
+
         {
-            "q": "Which number is the Cyber Crime Helpline in India?",
+            "question": "Which number is India's Cyber Crime Helpline?",
             "options": [
                 "100",
                 "181",
@@ -527,8 +652,9 @@ elif page == "🧠 Safety Quiz":
             ],
             "answer": "1930"
         },
+
         {
-            "q": "What should you do if someone asks for your UPI PIN to receive money?",
+            "question": "Someone asks for your UPI PIN to send you money. What should you do?",
             "options": [
                 "Give the PIN",
                 "Enter the PIN",
@@ -536,57 +662,89 @@ elif page == "🧠 Safety Quiz":
                 "Send the PIN by SMS"
             ],
             "answer": "Do not share the PIN"
+        },
+
+        {
+            "question": "What should you do with an unknown suspicious link?",
+            "options": [
+                "Click it",
+                "Open it on another phone",
+                "Avoid clicking it",
+                "Forward it"
+            ],
+            "answer": "Avoid clicking it"
         }
     ]
 
-    score = 0
-
-    answers = []
+    selected_answers = []
 
     for i, item in enumerate(questions):
 
         st.subheader(f"Question {i + 1}")
 
-        selected = st.radio(
-            item["q"],
+        answer = st.radio(
+            item["question"],
             item["options"],
-            key=f"question_{i}"
+            key=f"quiz_{i}"
         )
 
-        answers.append(selected)
+        selected_answers.append(answer)
 
-    if st.button("✅ Submit Quiz"):
+    if st.button("✅ Submit Quiz", use_container_width=True):
+
+        score = 0
 
         for i, item in enumerate(questions):
 
-            if answers[i] == item["answer"]:
+            if selected_answers[i] == item["answer"]:
                 score += 1
 
-        st.success(f"Your Score: {score}/{len(questions)}")
+        total = len(questions)
 
-        if score == len(questions):
+        st.success(f"🎉 Your Score: {score}/{total}")
+
+        if score == total:
+
             st.balloons()
-            st.success("Excellent! You have strong digital safety awareness.")
-        elif score >= 2:
-            st.info("Good job! Review the safety tips once more.")
-        else:
-            st.warning("Please review the online safety section again.")
 
-        # Store quiz record in Supabase
+            st.success(
+                "Excellent! You have very good digital safety awareness."
+            )
+
+        elif score >= 3:
+
+            st.info(
+                "Good job! Review the safety tips to improve further."
+            )
+
+        else:
+
+            st.warning(
+                "Please review the Smartphone Guide and Scam Awareness sections."
+            )
+
+        # SAVE RESULT TO SUPABASE
+
         if supabase:
 
             try:
 
                 supabase.table("quiz_results").insert({
                     "score": score,
-                    "total_questions": len(questions),
+                    "total_questions": total,
                     "created_at": datetime.now().isoformat()
                 }).execute()
 
-                st.info("Quiz result saved successfully.")
+                st.success(
+                    "✅ Your quiz result has been saved."
+                )
 
-            except Exception as e:
-                st.warning("Quiz result could not be saved to database.")
+            except Exception:
+
+                st.warning(
+                    "Quiz result could not be saved. "
+                    "Please check your Supabase table."
+                )
 
 # ============================================================
 # WOMEN ONLINE SAFETY
@@ -596,33 +754,51 @@ elif page == "👩 Women Online Safety":
 
     st.title("👩 Women Online Safety")
 
-    sections = {
+    safety_sections = {
+
         "🔐 Protect Personal Information":
-            "Avoid sharing your Aadhaar number, bank details, OTP, passwords, home address and other sensitive information publicly.",
+            "Do not publicly share passwords, OTPs, banking details, "
+            "Aadhaar information or your home address.",
 
         "📸 Social Media Safety":
-            "Keep profiles private when appropriate. Review followers and avoid accepting unknown requests.",
+            "Review your privacy settings and avoid accepting requests "
+            "from unknown people.",
 
         "👤 Fake Profiles":
-            "If someone creates a fake profile using your identity, save screenshots and report the profile through the platform.",
+            "If someone creates a fake profile pretending to be you, "
+            "take screenshots, report the account and block it.",
 
         "🚫 Online Harassment":
-            "Do not engage with threatening messages. Block the account, preserve evidence and report the incident.",
+            "Do not engage with threatening messages. Save evidence, "
+            "block the person and report the account.",
 
         "📍 Location Privacy":
-            "Avoid publicly sharing your live location or routine unless necessary.",
+            "Avoid publicly sharing your live location or daily routine.",
 
-        "🔑 Strong Password":
-            "Use long, unique passwords and enable two-factor authentication whenever possible.",
+        "🔑 Strong Passwords":
+            "Use unique and strong passwords for important accounts "
+            "and enable two-factor authentication.",
 
         "📱 Phone Security":
-            "Use screen lock, keep software updated and avoid installing apps from unknown sources."
+            "Use a screen lock, update your phone regularly and install "
+            "apps only from trusted sources.",
+
+        "💳 Banking Safety":
+            "Never share OTP, UPI PIN, ATM PIN or banking passwords with anyone."
     }
 
-    for title, text in sections.items():
+    for title, information in safety_sections.items():
 
         with st.expander(title):
-            st.write(text)
+
+            st.write(information)
+
+    st.markdown("""
+    <div class="safe">
+        <b>🛡️ Stay Safe Online</b><br>
+        Stop • Think • Verify • Then Act
+    </div>
+    """, unsafe_allow_html=True)
 
 # ============================================================
 # RECORDS
@@ -644,26 +820,44 @@ elif page == "📊 Records":
                 .execute()
             )
 
-            data = response.data
+            records = response.data
 
-            if data:
-                df = pd.DataFrame(data)
+            if records:
+
+                df = pd.DataFrame(records)
+
                 st.dataframe(
                     df,
-                    use_container_width=True
+                    use_container_width=True,
+                    hide_index=True
                 )
-            else:
-                st.info("No quiz records available yet.")
 
-        except Exception:
+                st.metric(
+                    "Total Quiz Attempts",
+                    len(df)
+                )
+
+            else:
+
+                st.info(
+                    "No quiz records available yet."
+                )
+
+        except Exception as e:
+
             st.error(
-                "Could not load records. Check your Supabase table and connection."
+                "Unable to load records. "
+                "Please check your Supabase table."
             )
 
     else:
 
         st.warning(
-            "Supabase is not connected. Add SUPABASE_URL and SUPABASE_KEY in Streamlit secrets."
+            "Supabase is not connected."
+        )
+
+        st.write(
+            "Add SUPABASE_URL and SUPABASE_KEY in Streamlit Secrets."
         )
 
 # ============================================================
@@ -673,5 +867,5 @@ elif page == "📊 Records":
 st.markdown("---")
 
 st.caption(
-    "🌸 Digital Saheli | Smartphone Usage & Online Safety Awareness for Women"
+    "🌸 Digital Saheli | Smartphone Usage & Online Safety for Women"
 )
