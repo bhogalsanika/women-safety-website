@@ -1,81 +1,78 @@
 import streamlit as st
-from supabase import create_client, Client
-import pandas as pd
-import plotly.express as px
-from datetime import date
-
 
 # ============================================================
-# PAGE CONFIGURATION
+# PAGE CONFIG
 # ============================================================
 
 st.set_page_config(
-    page_title="Women Safety Management System",
-    page_icon="🌸",
-    layout="wide",
-    initial_sidebar_state="expanded"
+    page_title="Women Digital Help",
+    page_icon="📱",
+    layout="wide"
 )
 
-
 # ============================================================
-# CUSTOM CSS
+# CSS
 # ============================================================
 
 st.markdown("""
 <style>
 
-.stApp {
-    background-color: #f7f8fa;
+.main {
+    background-color: #f7f8fc;
 }
 
-section[data-testid="stSidebar"] {
-    background-color: #ffffff;
-    border-right: 1px solid #e2e5e9;
+.hero {
+    text-align: center;
+    padding: 45px 20px 25px 20px;
 }
 
-h1, h2, h3 {
-    color: #1f2937;
-    font-weight: 600;
+.hero h1 {
+    font-size: 46px;
+    margin-bottom: 5px;
 }
 
-p, label, div {
-    color: #374151;
+.hero p {
+    font-size: 20px;
+    color: #666;
 }
 
-div[data-testid="stMetric"] {
-    background-color: #ffffff;
-    border: 1px solid #e2e5e9;
-    border-radius: 10px;
-    padding: 18px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+.search-box {
+    background: white;
+    padding: 20px;
+    border-radius: 18px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    margin-bottom: 30px;
 }
 
-.stButton > button {
-    border-radius: 6px;
-    border: 1px solid #1f4e79;
-    background-color: #1f4e79;
-    color: white;
-    font-weight: 500;
-    padding: 8px 18px;
+.card {
+    background: white;
+    padding: 22px;
+    border-radius: 16px;
+    margin-bottom: 15px;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.06);
 }
 
-.stButton > button:hover {
-    background-color: #163a5c;
-    border-color: #163a5c;
-    color: white;
+.card h3 {
+    margin-top: 0;
 }
 
-.info-box {
-    background-color: #ffffff;
-    border-left: 4px solid #1f4e79;
+.step {
+    background: #f1f3f8;
     padding: 15px;
-    border-radius: 5px;
-    margin-bottom: 20px;
+    border-radius: 12px;
+    margin: 8px 0;
 }
 
-.section-line {
-    border-bottom: 1px solid #e2e5e9;
-    margin: 10px 0 25px 0;
+.correct {
+    padding: 15px;
+    border-radius: 12px;
+    background: #e8f7ee;
+}
+
+.wrong {
+    padding: 15px;
+    border-radius: 12px;
+    background: #fdeaea;
 }
 
 </style>
@@ -83,1314 +80,607 @@ div[data-testid="stMetric"] {
 
 
 # ============================================================
-# SUPABASE CONNECTION
+# TOP HERO
 # ============================================================
 
-@st.cache_resource
-def init_connection() -> Client:
-    return create_client(
-        st.secrets["SUPABASE_URL"],
-        st.secrets["SUPABASE_KEY"]
-    )
-
-
-try:
-    supabase = init_connection()
-
-except Exception:
-    st.error(
-        "Unable to connect to Supabase. "
-        "Please verify SUPABASE_URL and SUPABASE_KEY "
-        "in Streamlit Secrets."
-    )
-    st.stop()
+st.markdown("""
+<div class="hero">
+    <h1>📱 Women Digital Help</h1>
+    <p>Learn smartphone usage • Practice online safety • Stay confident</p>
+</div>
+""", unsafe_allow_html=True)
 
 
 # ============================================================
-# DATABASE FUNCTIONS
+# SEARCH
 # ============================================================
 
-def get_table(table_name):
+st.markdown('<div class="search-box">', unsafe_allow_html=True)
 
-    try:
-        response = (
-            supabase
-            .table(table_name)
-            .select("*")
-            .execute()
-        )
-
-        return response.data
-
-    except Exception as e:
-
-        st.error(
-            f"Unable to retrieve data from {table_name}: {e}"
-        )
-
-        return []
-
-
-def add_record(table_name, data):
-
-    try:
-
-        supabase.table(
-            table_name
-        ).insert(data).execute()
-
-        return True
-
-    except Exception as e:
-
-        st.error(
-            f"Unable to add record: {e}"
-        )
-
-        return False
-
-
-def update_record(table_name, column, value, data):
-
-    try:
-
-        supabase.table(
-            table_name
-        ).update(data).eq(
-            column,
-            value
-        ).execute()
-
-        return True
-
-    except Exception as e:
-
-        st.error(
-            f"Unable to update record: {e}"
-        )
-
-        return False
-
-
-def delete_record(table_name, column, value):
-
-    try:
-
-        supabase.table(
-            table_name
-        ).delete().eq(
-            column,
-            value
-        ).execute()
-
-        return True
-
-    except Exception as e:
-
-        st.error(
-            f"Unable to delete record: {e}"
-        )
-
-        return False
-
-
-# ============================================================
-# SIDEBAR NAVIGATION
-# ============================================================
-
-st.sidebar.markdown(
-    "## 🌸 Women Safety Management System"
+search = st.text_input(
+    "🔍 What do you want to learn?",
+    placeholder="Example: WhatsApp, UPI, OTP, Camera, Password..."
 )
 
-st.sidebar.markdown(
-    "Smartphone Usage and Online Safety "
-    "for Women Self Help Groups"
-)
-
-st.sidebar.markdown("---")
-
-page = st.sidebar.radio(
-    "Navigation",
-    [
-        "Dashboard",
-        "Participants",
-        "Smartphone Usage",
-        "Safety Events",
-        "Training Sessions",
-        "🚨 Scam Reports",
-        "Reports"
-    ]
-)
-
-st.sidebar.markdown("---")
-
-st.sidebar.caption(
-    "Community Engagement Project"
-)
-
-st.sidebar.caption(
-    "Database Management System"
-)
+st.markdown("</div>", unsafe_allow_html=True)
 
 
 # ============================================================
-# LOAD DATA
+# TOPICS
 # ============================================================
 
-participants = get_table("participants")
-usage_records = get_table("smartphone_usage")
-safety_events = get_table("safety_events")
-training_sessions = get_table("training_sessions")
-scam_reports = get_table("scam_reports")
-
-participants_df = pd.DataFrame(participants)
-usage_df = pd.DataFrame(usage_records)
-events_df = pd.DataFrame(safety_events)
-training_df = pd.DataFrame(training_sessions)
-scam_df = pd.DataFrame(scam_reports)
+topics = {
+    "📱 WhatsApp": "whatsapp",
+    "💳 UPI Payment": "upi",
+    "📸 Camera": "camera",
+    "🌐 Internet": "internet",
+    "📲 Install App": "apps",
+    "🔐 Phone Lock": "lock",
+    "📍 Location": "location",
+    "🛡️ Online Safety": "safety"
+}
 
 
 # ============================================================
-# DASHBOARD
+# SEARCH LOGIC
 # ============================================================
 
-if page == "Dashboard":
+selected_topic = None
 
-    st.title("Dashboard")
+if search:
 
-    st.markdown(
-        "Overview of smartphone usage and online safety "
-        "activities within the Women Self Help Group."
+    search_text = search.lower()
+
+    if "whatsapp" in search_text:
+        selected_topic = "whatsapp"
+
+    elif "upi" in search_text or "payment" in search_text:
+        selected_topic = "upi"
+
+    elif "camera" in search_text or "photo" in search_text:
+        selected_topic = "camera"
+
+    elif "internet" in search_text or "google" in search_text:
+        selected_topic = "internet"
+
+    elif "app" in search_text or "install" in search_text:
+        selected_topic = "apps"
+
+    elif "lock" in search_text or "password" in search_text:
+        selected_topic = "lock"
+
+    elif "location" in search_text:
+        selected_topic = "location"
+
+    elif (
+        "safety" in search_text
+        or "otp" in search_text
+        or "fraud" in search_text
+        or "scam" in search_text
+    ):
+        selected_topic = "safety"
+
+    else:
+        st.warning(
+            "Sorry, this topic is not available yet. "
+            "Try WhatsApp, UPI, Camera, Internet, Apps, Password or Safety."
+        )
+
+
+# ============================================================
+# QUICK TOPIC BUTTONS
+# ============================================================
+
+if not selected_topic:
+
+    st.subheader("✨ What would you like to learn?")
+
+    col1, col2, col3, col4 = st.columns(4)
+
+    buttons = list(topics.items())
+
+    for i, (name, value) in enumerate(buttons):
+
+        with [col1, col2, col3, col4][i % 4]:
+
+            if st.button(name, use_container_width=True):
+                st.session_state["topic"] = value
+                st.rerun()
+
+
+# Get topic from session
+
+if "topic" in st.session_state and not selected_topic:
+    selected_topic = st.session_state["topic"]
+
+
+# ============================================================
+# WHATSAPP
+# ============================================================
+
+if selected_topic == "whatsapp":
+
+    st.title("📱 Learn WhatsApp")
+
+    st.write(
+        "Learn basic WhatsApp features and how to stay safe while using them."
     )
 
-    st.markdown(
-        '<div class="section-line"></div>',
-        unsafe_allow_html=True
+    option = st.radio(
+        "What do you want to learn?",
+        [
+            "Send a Message",
+            "Send a Photo",
+            "Voice Call",
+            "WhatsApp Safety"
+        ]
     )
 
-    col1, col2, col3, col4, col5 = st.columns(5)
+    if option == "Send a Message":
 
-    col1.metric(
-        "Total Participants",
-        len(participants_df)
-    )
+        st.subheader("💬 How to send a WhatsApp message")
 
-    col2.metric(
-        "Usage Records",
-        len(usage_df)
-    )
+        steps = [
+            "Open WhatsApp.",
+            "Select the person you want to message.",
+            "Tap the message box.",
+            "Type your message.",
+            "Press the Send button."
+        ]
 
-    col3.metric(
-        "Safety Events",
-        len(events_df)
-    )
+        for i, step in enumerate(steps, 1):
+            st.markdown(
+                f'<div class="step">Step {i}️⃣ — {step}</div>',
+                unsafe_allow_html=True
+            )
 
-    col4.metric(
-        "Training Sessions",
-        len(training_df)
-    )
+        if st.button("✅ I understood"):
+            st.success("Great! You learned how to send a message.")
 
-    col5.metric(
-        "Scam Reports",
-        len(scam_df)
-    )
+    elif option == "Send a Photo":
 
-    st.markdown("### System Overview")
+        st.subheader("📸 How to send a photo")
 
-    if participants_df.empty:
+        steps = [
+            "Open the WhatsApp chat.",
+            "Tap the attachment/camera option.",
+            "Choose a photo.",
+            "Check the selected photo.",
+            "Tap Send."
+        ]
+
+        for i, step in enumerate(steps, 1):
+            st.markdown(
+                f'<div class="step">Step {i}️⃣ — {step}</div>',
+                unsafe_allow_html=True
+            )
+
+        if st.button("📸 Practice Complete"):
+            st.success("Excellent! You know how to send a photo.")
+
+    elif option == "Voice Call":
+
+        st.subheader("📞 WhatsApp Voice Call")
+
+        st.write("To make a voice call:")
+
+        st.markdown("""
+        <div class="step">1️⃣ Open the WhatsApp chat.</div>
+        <div class="step">2️⃣ Tap the phone icon.</div>
+        <div class="step">3️⃣ Wait for the person to answer.</div>
+        """, unsafe_allow_html=True)
 
         st.info(
-            "No participant records are available yet."
+            "Safety Tip: Do not share private information with unknown callers."
         )
 
     else:
 
-        col1, col2 = st.columns(2)
+        st.subheader("🛡️ WhatsApp Safety")
 
-        with col1:
+        safety = [
+            "Do not share OTP with anyone.",
+            "Do not open suspicious links.",
+            "Do not share private photos with unknown people.",
+            "Check unknown group invitations carefully.",
+            "Use WhatsApp privacy settings."
+        ]
 
-            if "occupation" in participants_df.columns:
+        for item in safety:
+            st.checkbox(item)
 
-                occupation_data = (
-                    participants_df["occupation"]
-                    .fillna("Not Specified")
-                    .value_counts()
-                    .reset_index()
-                )
-
-                occupation_data.columns = [
-                    "Occupation",
-                    "Participants"
-                ]
-
-                fig = px.bar(
-                    occupation_data,
-                    x="Occupation",
-                    y="Participants",
-                    title="Participants by Occupation"
-                )
-
-                fig.update_layout(
-                    template="simple_white",
-                    height=350
-                )
-
-                st.plotly_chart(
-                    fig,
-                    use_container_width=True
-                )
-
-        with col2:
-
-            if "smartphone_user" in participants_df.columns:
-
-                smartphone_data = (
-                    participants_df["smartphone_user"]
-                    .map({
-                        True: "Smartphone User",
-                        False: "Non-Smartphone User"
-                    })
-                    .value_counts()
-                    .reset_index()
-                )
-
-                smartphone_data.columns = [
-                    "Category",
-                    "Participants"
-                ]
-
-                fig = px.pie(
-                    smartphone_data,
-                    names="Category",
-                    values="Participants",
-                    title="Smartphone Usage Status"
-                )
-
-                fig.update_layout(
-                    height=350
-                )
-
-                st.plotly_chart(
-                    fig,
-                    use_container_width=True
-                )
+        if st.button("🔎 Check My Safety"):
+            st.success("Good! Review any unchecked safety points.")
 
 
 # ============================================================
-# PARTICIPANTS
+# UPI
 # ============================================================
 
-elif page == "Participants":
+elif selected_topic == "upi":
 
-    st.title("Participant Management")
+    st.title("💳 UPI Payment Practice")
 
-    st.markdown(
-        "Manage participant information associated "
-        "with the Women Self Help Group."
+    st.write(
+        "Practice common UPI situations and learn what is safe."
     )
 
-    st.markdown(
-        '<div class="section-line"></div>',
-        unsafe_allow_html=True
+    st.subheader("Scenario 1")
+
+    st.info(
+        "A person says: 'I am sending you money. "
+        "Please enter your UPI PIN to receive it.'"
     )
 
-    tab1, tab2 = st.tabs([
-        "Add Participant",
-        "View Participants"
-    ])
+    answer = st.radio(
+        "What should you do?",
+        [
+            "Enter my UPI PIN",
+            "Do not enter PIN and verify the transaction"
+        ],
+        key="upi1"
+    )
 
-    # --------------------------------------------------------
-    # ADD PARTICIPANT
-    # --------------------------------------------------------
+    if st.button("Check Answer", key="checkupi"):
 
-    with tab1:
+        if answer == "Do not enter PIN and verify the transaction":
 
-        with st.form("participant_form"):
-
-            col1, col2 = st.columns(2)
-
-            with col1:
-
-                name = st.text_input(
-                    "Full Name"
-                )
-
-                age = st.number_input(
-                    "Age",
-                    min_value=18,
-                    max_value=100,
-                    value=25
-                )
-
-                contact = st.text_input(
-                    "Contact Number"
-                )
-
-            with col2:
-
-                occupation = st.text_input(
-                    "Occupation"
-                )
-
-                smartphone_user = st.selectbox(
-                    "Smartphone User",
-                    ["Yes", "No"]
-                )
-
-            submitted = st.form_submit_button(
-                "Add Participant"
-            )
-
-            if submitted:
-
-                if not name.strip():
-
-                    st.warning(
-                        "Please enter the participant name."
-                    )
-
-                else:
-
-                    data = {
-                        "name": name.strip(),
-                        "age": age,
-                        "contact": contact.strip(),
-                        "occupation": occupation.strip(),
-                        "smartphone_user":
-                            smartphone_user == "Yes"
-                    }
-
-                    if add_record(
-                        "participants",
-                        data
-                    ):
-
-                        st.success(
-                            "Participant added successfully."
-                        )
-
-                        st.rerun()
-
-    # --------------------------------------------------------
-    # VIEW PARTICIPANTS
-    # --------------------------------------------------------
-
-    with tab2:
-
-        if participants_df.empty:
-
-            st.info(
-                "No participant records found."
+            st.success(
+                "✅ Correct! Your UPI PIN is used to authorize payments. "
+                "Never share it with anyone."
             )
 
         else:
 
-            search = st.text_input(
-                "Search participant"
+            st.error(
+                "❌ Not safe. Never share your UPI PIN with another person."
             )
 
-            display_df = participants_df.copy()
+    st.divider()
 
-            if search:
+    st.subheader("Scenario 2")
 
-                display_df = display_df[
-                    display_df["name"]
-                    .astype(str)
-                    .str.contains(
-                        search,
-                        case=False,
-                        na=False
-                    )
-                ]
+    st.info(
+        "Someone sends you a QR code and says: "
+        "'Scan this to receive ₹5,000.'"
+    )
 
-            st.dataframe(
-                display_df,
-                use_container_width=True,
-                hide_index=True
-            )
+    qr_answer = st.radio(
+        "What is safer?",
+        [
+            "Scan immediately",
+            "Verify the person and transaction first"
+        ],
+        key="upi2"
+    )
 
+    if st.button("Check QR Answer"):
+
+        if qr_answer == "Verify the person and transaction first":
+            st.success("✅ Correct! Always verify unexpected payment requests.")
+        else:
+            st.error("❌ Be careful with unknown QR codes.")
+
+
+# ============================================================
+# CAMERA
+# ============================================================
+
+elif selected_topic == "camera":
+
+    st.title("📸 Learn Camera")
+
+    action = st.selectbox(
+        "Choose an activity",
+        [
+            "Take a Photo",
+            "Record a Video",
+            "Keep Photos Private"
+        ]
+    )
+
+    if action == "Take a Photo":
+
+        st.subheader("📷 Taking a photo")
+
+        steps = [
+            "Open the Camera app.",
+            "Point the camera at the subject.",
+            "Tap the capture button.",
+            "Open Gallery to view the photo."
+        ]
+
+        for i, step in enumerate(steps, 1):
             st.markdown(
-                "### Delete Participant"
+                f'<div class="step">Step {i}️⃣ — {step}</div>',
+                unsafe_allow_html=True
             )
 
-            participant_ids = (
-                display_df["participant_id"]
-                .tolist()
-            )
+        if st.button("📸 Done"):
+            st.success("Photo lesson completed!")
 
-            if participant_ids:
+    elif action == "Record a Video":
 
-                selected_id = st.selectbox(
-                    "Select Participant ID",
-                    participant_ids
-                )
+        st.subheader("🎥 Recording a video")
 
-                if st.button(
-                    "Delete Participant"
-                ):
-
-                    if delete_record(
-                        "participants",
-                        "participant_id",
-                        selected_id
-                    ):
-
-                        st.success(
-                            "Participant deleted successfully."
-                        )
-
-                        st.rerun()
-
-
-# ============================================================
-# SMARTPHONE USAGE
-# ============================================================
-
-elif page == "Smartphone Usage":
-
-    st.title(
-        "Smartphone Usage Management"
-    )
-
-    st.markdown(
-        "Record and analyze how participants use "
-        "smartphones and digital services."
-    )
-
-    st.markdown(
-        '<div class="section-line"></div>',
-        unsafe_allow_html=True
-    )
-
-    if participants_df.empty:
-
-        st.warning(
-            "Please add participants before recording "
-            "smartphone usage."
+        st.write(
+            "Open Camera → select Video → press Record → "
+            "press Stop when finished."
         )
+
+        st.success("Tip: Keep your phone steady while recording.")
 
     else:
 
-        tab1, tab2 = st.tabs([
-            "Add Usage Record",
-            "View Usage Records"
-        ])
-
-        with tab1:
-
-            participant_options = {
-                f"{row['participant_id']} - {row['name']}":
-                row["participant_id"]
-                for _, row in participants_df.iterrows()
-            }
-
-            with st.form("usage_form"):
-
-                participant = st.selectbox(
-                    "Participant",
-                    list(participant_options.keys())
-                )
-
-                usage_purpose = st.selectbox(
-                    "Primary Usage Purpose",
-                    [
-                        "Communication",
-                        "Social Media",
-                        "Education",
-                        "Digital Payments",
-                        "Online Shopping",
-                        "Entertainment",
-                        "Business",
-                        "Other"
-                    ]
-                )
-
-                col1, col2 = st.columns(2)
-
-                with col1:
-
-                    social_media = st.checkbox(
-                        "Uses Social Media"
-                    )
-
-                    digital_payment = st.checkbox(
-                        "Uses Digital Payments"
-                    )
-
-                    online_shopping = st.checkbox(
-                        "Uses Online Shopping"
-                    )
-
-                with col2:
-
-                    education = st.checkbox(
-                        "Uses Smartphone for Education"
-                    )
-
-                    daily_hours = st.number_input(
-                        "Daily Smartphone Usage (Hours)",
-                        min_value=0.0,
-                        max_value=24.0,
-                        value=2.0,
-                        step=0.5
-                    )
-
-                submitted = st.form_submit_button(
-                    "Add Usage Record"
-                )
-
-                if submitted:
-
-                    data = {
-                        "participant_id":
-                            participant_options[participant],
-
-                        "usage_purpose":
-                            usage_purpose,
-
-                        "social_media":
-                            social_media,
-
-                        "digital_payment":
-                            digital_payment,
-
-                        "online_shopping":
-                            online_shopping,
-
-                        "education":
-                            education,
-
-                        "daily_usage_hours":
-                            daily_hours
-                    }
-
-                    if add_record(
-                        "smartphone_usage",
-                        data
-                    ):
-
-                        st.success(
-                            "Smartphone usage record "
-                            "added successfully."
-                        )
-
-                        st.rerun()
-
-        with tab2:
-
-            if usage_df.empty:
-
-                st.info(
-                    "No smartphone usage records found."
-                )
-
-            else:
-
-                st.dataframe(
-                    usage_df,
-                    use_container_width=True,
-                    hide_index=True
-                )
-
-
-# ============================================================
-# SAFETY EVENTS
-# ============================================================
-
-elif page == "Safety Events":
-
-    st.title(
-        "Online Safety Events"
-    )
-
-    st.markdown(
-        "Record online safety concerns and actions "
-        "taken by participants."
-    )
-
-    st.markdown(
-        '<div class="section-line"></div>',
-        unsafe_allow_html=True
-    )
-
-    if participants_df.empty:
+        st.subheader("🔐 Keep photos private")
 
         st.warning(
-            "Please add participants before recording "
-            "safety events."
+            "Avoid sending private photos to unknown people. "
+            "Review who can access your photos and cloud backups."
         )
+
+
+# ============================================================
+# INTERNET
+# ============================================================
+
+elif selected_topic == "internet":
+
+    st.title("🌐 Learn Internet Searching")
+
+    st.write("Practice searching for information safely.")
+
+    query = st.text_input(
+        "What would you search for?",
+        placeholder="Example: nearest hospital"
+    )
+
+    if st.button("🔍 Search Practice"):
+
+        if query:
+            st.success(f'Good! You searched for: "{query}"')
+
+            st.info(
+                "Safety Tip: Check whether the website is trustworthy "
+                "before entering personal information."
+            )
+        else:
+            st.warning("Enter something to search.")
+
+
+# ============================================================
+# INSTALL APP
+# ============================================================
+
+elif selected_topic == "apps":
+
+    st.title("📲 How to Install an App")
+
+    steps = [
+        "Open Google Play Store.",
+        "Search for the required app.",
+        "Check the app name and developer.",
+        "Read reviews and check downloads.",
+        "Tap Install.",
+        "Open the app after installation."
+    ]
+
+    for i, step in enumerate(steps, 1):
+        st.markdown(
+            f'<div class="step">Step {i}️⃣ — {step}</div>',
+            unsafe_allow_html=True
+        )
+
+    st.warning(
+        "⚠️ Avoid installing apps from unknown links or websites."
+    )
+
+    if st.button("✅ I learned this"):
+        st.success("Good! You know the basic app installation process.")
+
+
+# ============================================================
+# PHONE LOCK
+# ============================================================
+
+elif selected_topic == "lock":
+
+    st.title("🔐 Protect Your Phone")
+
+    st.write("A phone lock helps protect your personal information.")
+
+    lock_type = st.selectbox(
+        "Choose a protection method",
+        [
+            "PIN",
+            "Password",
+            "Pattern",
+            "Fingerprint"
+        ]
+    )
+
+    st.info(
+        f"You selected: {lock_type}. "
+        "Use a method that is difficult for others to guess."
+    )
+
+    if st.button("🔒 Complete Security Check"):
+
+        st.success(
+            "Remember: Never share your phone password/PIN with strangers."
+        )
+
+
+# ============================================================
+# LOCATION
+# ============================================================
+
+elif selected_topic == "location":
+
+    st.title("📍 Location Sharing")
+
+    st.write(
+        "Location sharing can be useful, but it should be controlled carefully."
+    )
+
+    choices = [
+        "I check which apps have location permission.",
+        "I avoid sharing my live location with strangers.",
+        "I turn off location when it is not needed.",
+        "I check location settings regularly."
+    ]
+
+    for choice in choices:
+        st.checkbox(choice)
+
+    if st.button("📍 Check Location Safety"):
+        st.success(
+            "Good! Review your location permissions regularly."
+        )
+
+
+# ============================================================
+# ONLINE SAFETY
+# ============================================================
+
+elif selected_topic == "safety":
+
+    st.title("🛡️ Online Safety Practice")
+
+    scenario = st.selectbox(
+        "Choose a situation",
+        [
+            "Unknown OTP Request",
+            "Suspicious Link",
+            "Fake Prize Message",
+            "Unknown Friend Request",
+            "Online Harassment"
+        ]
+    )
+
+    if scenario == "Unknown OTP Request":
+
+        st.info(
+            "Someone calls you and asks for the OTP received on your phone."
+        )
+
+        ans = st.radio(
+            "What will you do?",
+            [
+                "Tell them the OTP",
+                "Do not share the OTP"
+            ]
+        )
+
+        if st.button("Check OTP Answer"):
+
+            if ans == "Do not share the OTP":
+                st.success(
+                    "✅ Correct! OTP should be kept private."
+                )
+            else:
+                st.error(
+                    "❌ Never share OTP with another person."
+                )
+
+    elif scenario == "Suspicious Link":
+
+        st.info(
+            "You receive: 'Your account will be blocked today. "
+            "Click this link immediately.'"
+        )
+
+        ans = st.radio(
+            "What should you do?",
+            [
+                "Click the link immediately",
+                "Do not click and verify through the official app/website"
+            ]
+        )
+
+        if st.button("Check Link Answer"):
+
+            if ans.startswith("Do not"):
+                st.success("✅ Correct! Verify before clicking.")
+            else:
+                st.error("❌ Suspicious links can lead to scams.")
+
+    elif scenario == "Fake Prize Message":
+
+        st.info(
+            "You receive a message saying you won ₹50,000 "
+            "and must pay a fee first."
+        )
+
+        ans = st.radio(
+            "What should you do?",
+            [
+                "Pay the fee",
+                "Do not pay and verify the claim"
+            ]
+        )
+
+        if st.button("Check Prize Answer"):
+
+            if ans == "Do not pay and verify the claim":
+                st.success("✅ Correct! Unexpected prize claims can be scams.")
+            else:
+                st.error("❌ Do not send money to claim an unexpected prize.")
+
+    elif scenario == "Unknown Friend Request":
+
+        st.info(
+            "An unknown person sends a friend request and immediately "
+            "asks for your personal details."
+        )
+
+        ans = st.radio(
+            "What is safer?",
+            [
+                "Share my details",
+                "Do not share and verify the account"
+            ]
+        )
+
+        if st.button("Check Profile Answer"):
+
+            if ans.startswith("Do not"):
+                st.success("✅ Correct! Be careful with unknown profiles.")
+            else:
+                st.error("❌ Avoid sharing personal information.")
 
     else:
 
-        tab1, tab2 = st.tabs([
-            "Report Safety Event",
-            "View Events"
-        ])
-
-        with tab1:
-
-            participant_options = {
-                f"{row['participant_id']} - {row['name']}":
-                row["participant_id"]
-                for _, row in participants_df.iterrows()
-            }
-
-            with st.form("safety_form"):
-
-                participant = st.selectbox(
-                    "Participant",
-                    list(participant_options.keys())
-                )
-
-                event_type = st.selectbox(
-                    "Event Type",
-                    [
-                        "Suspicious Message",
-                        "Phishing Link",
-                        "Online Scam",
-                        "Fake Account",
-                        "Cyberbullying",
-                        "Payment Fraud Attempt",
-                        "Privacy Concern",
-                        "Other"
-                    ]
-                )
-
-                event_date = st.date_input(
-                    "Event Date",
-                    value=date.today()
-                )
-
-                description = st.text_area(
-                    "Description"
-                )
-
-                action_taken = st.text_area(
-                    "Action Taken"
-                )
-
-                reported = st.selectbox(
-                    "Reported",
-                    ["Yes", "No"]
-                )
-
-                submitted = st.form_submit_button(
-                    "Save Safety Event"
-                )
-
-                if submitted:
-
-                    data = {
-                        "participant_id":
-                            participant_options[participant],
-
-                        "event_type":
-                            event_type,
-
-                        "event_date":
-                            str(event_date),
-
-                        "description":
-                            description,
-
-                        "action_taken":
-                            action_taken,
-
-                        "reported":
-                            reported == "Yes"
-                    }
-
-                    if add_record(
-                        "safety_events",
-                        data
-                    ):
-
-                        st.success(
-                            "Safety event recorded successfully."
-                        )
-
-                        st.rerun()
-
-        with tab2:
-
-            if events_df.empty:
-
-                st.info(
-                    "No safety events have been recorded."
-                )
-
-            else:
-
-                st.dataframe(
-                    events_df,
-                    use_container_width=True,
-                    hide_index=True
-                )
-
-
-# ============================================================
-# TRAINING SESSIONS
-# ============================================================
-
-elif page == "Training Sessions":
-
-    st.title(
-        "Training and Awareness Sessions"
-    )
-
-    st.markdown(
-        "Manage digital literacy and online safety "
-        "awareness sessions."
-    )
-
-    st.markdown(
-        '<div class="section-line"></div>',
-        unsafe_allow_html=True
-    )
-
-    tab1, tab2 = st.tabs([
-        "Add Session",
-        "View Sessions"
-    ])
-
-    # --------------------------------------------------------
-    # ADD SESSION
-    # --------------------------------------------------------
-
-    with tab1:
-
-        with st.form("training_form"):
-
-            session_date = st.date_input(
-                "Session Date",
-                value=date.today()
-            )
-
-            topic = st.selectbox(
-                "Training Topic",
-                [
-                    "Smartphone Basics",
-                    "Password Security",
-                    "Online Banking Safety",
-                    "Digital Payments",
-                    "Social Media Safety",
-                    "Phishing Awareness",
-                    "Privacy Settings",
-                    "Cyber Fraud Awareness",
-                    "Other"
-                ]
-            )
-
-            trainer_name = st.text_input(
-                "Trainer / Resource Person"
-            )
-
-            participants_count = st.number_input(
-                "Number of Participants",
-                min_value=1,
-                max_value=1000,
-                value=10
-            )
-
-            notes = st.text_area(
-                "Notes"
-            )
-
-            submitted = st.form_submit_button(
-                "Add Training Session"
-            )
-
-            if submitted:
-
-                if not trainer_name.strip():
-
-                    st.warning(
-                        "Please enter trainer name."
-                    )
-
-                else:
-
-                    data = {
-                        "session_date":
-                            str(session_date),
-
-                        "topic":
-                            topic,
-
-                        "trainer_name":
-                            trainer_name.strip(),
-
-                        "participants_count":
-                            participants_count,
-
-                        "notes":
-                            notes.strip()
-                    }
-
-                    if add_record(
-                        "training_sessions",
-                        data
-                    ):
-
-                        st.success(
-                            "Training session added successfully."
-                        )
-
-                        st.rerun()
-
-    # --------------------------------------------------------
-    # VIEW SESSIONS
-    # --------------------------------------------------------
-
-    with tab2:
-
-        if training_df.empty:
-
-            st.info(
-                "No training sessions found."
-            )
-
-        else:
-
-            st.dataframe(
-                training_df,
-                use_container_width=True,
-                hide_index=True
-            )
-
-
-# ============================================================
-# SCAM REPORTS
-# ============================================================
-
-elif page == "🚨 Scam Reports":
-
-    st.title(
-        "🚨 Scam Reports"
-    )
-
-    st.markdown(
-        "Record scam incidents and provide appropriate "
-        "guidance through the admin dashboard."
-    )
-
-    st.markdown(
-        '<div class="section-line"></div>',
-        unsafe_allow_html=True
-    )
-
-    tab1, tab2 = st.tabs([
-        "Report a Scam",
-        "Review Reports"
-    ])
-
-
-    # ========================================================
-    # REPORT A SCAM
-    # ========================================================
-
-    with tab1:
-
-        if participants_df.empty:
-
-            st.warning(
-                "Please add a participant before submitting "
-                "a scam report."
-            )
-
-        else:
-
-            participant_options = {
-                f"{row['participant_id']} - {row['name']}":
-                row["participant_id"]
-                for _, row in participants_df.iterrows()
-            }
-
-            with st.form("scam_report_form"):
-
-                participant = st.selectbox(
-                    "👩 Participant",
-                    list(participant_options.keys())
-                )
-
-                scam_type = st.selectbox(
-                    "🔴 Scam Type",
-                    [
-                        "UPI / Payment Scam",
-                        "OTP Scam",
-                        "WhatsApp Scam",
-                        "Fake Job Scam",
-                        "Online Shopping Scam",
-                        "Social Media Scam",
-                        "Phishing / Fake Link",
-                        "Fake Account",
-                        "Other"
-                    ]
-                )
-
-                incident_date = st.date_input(
-                    "📅 Date of Incident",
-                    value=date.today()
-                )
-
-                amount = st.number_input(
-                    "💰 Amount Lost (₹)",
-                    min_value=0.0,
-                    value=0.0,
-                    step=100.0
-                )
-
-                description = st.text_area(
-                    "📝 What happened?",
-                    placeholder=(
-                        "Describe the scam or suspicious activity..."
-                    )
-                )
-
-                submitted = st.form_submit_button(
-                    "🚨 Submit Scam Report"
-                )
-
-                if submitted:
-
-                    if not description.strip():
-
-                        st.warning(
-                            "Please describe what happened."
-                        )
-
-                    else:
-
-                        data = {
-                            "participant_id":
-                                participant_options[participant],
-
-                            "scam_type":
-                                scam_type,
-
-                            "incident_date":
-                                str(incident_date),
-
-                            "description":
-                                description.strip(),
-
-                            "amount":
-                                amount,
-
-                            "status":
-                                "Pending",
-
-                            "admin_response":
-                                ""
-                        }
-
-                        if add_record(
-                            "scam_reports",
-                            data
-                        ):
-
-                            st.success(
-                                "Scam report submitted successfully."
-                            )
-
-                            st.info(
-                                "For actual cyber fraud, "
-                                "contact 1930 and report the "
-                                "incident through the official "
-                                "National Cyber Crime Reporting Portal."
-                            )
-
-                            st.rerun()
-
-
-    # ========================================================
-    # REVIEW REPORTS
-    # ========================================================
-
-    with tab2:
-
-        current_reports = get_table(
-            "scam_reports"
+        st.info(
+            "Someone is repeatedly sending unwanted messages online."
         )
 
-        if not current_reports:
+        ans = st.radio(
+            "What is a safer response?",
+            [
+                "Keep replying",
+                "Save evidence, block/report the account and seek help"
+            ]
+        )
 
-            st.info(
-                "No scam reports have been submitted yet."
-            )
+        if st.button("Check Harassment Answer"):
 
-        else:
-
-            total_reports = len(
-                current_reports
-            )
-
-            pending_reports = sum(
-                1
-                for r in current_reports
-                if r.get("status") == "Pending"
-            )
-
-            guided_reports = sum(
-                1
-                for r in current_reports
-                if r.get("status") == "Guided"
-            )
-
-            col1, col2, col3 = st.columns(3)
-
-            col1.metric(
-                "Total Reports",
-                total_reports
-            )
-
-            col2.metric(
-                "Pending",
-                pending_reports
-            )
-
-            col3.metric(
-                "Guided",
-                guided_reports
-            )
-
-            st.markdown("---")
-
-            for report in current_reports:
-
-                participant_name = (
-                    "Unknown Participant"
+            if ans.startswith("Save"):
+                st.success(
+                    "✅ Correct! Keep evidence and use block/report options."
+                )
+            else:
+                st.error(
+                    "❌ Repeatedly engaging may not solve the problem."
                 )
 
-                if not participants_df.empty:
-
-                    matched = participants_df[
-                        participants_df["participant_id"]
-                        == report.get("participant_id")
-                    ]
-
-                    if not matched.empty:
-
-                        participant_name = (
-                            matched.iloc[0]["name"]
-                        )
-
-                with st.expander(
-                    f"🚨 {report.get('scam_type', 'Scam')} "
-                    f"— {participant_name}"
-                ):
-
-                    st.write(
-                        f"**Participant:** "
-                        f"{participant_name}"
-                    )
-
-                    st.write(
-                        f"**Scam Type:** "
-                        f"{report.get('scam_type', '')}"
-                    )
-
-                    st.write(
-                        f"**Incident Date:** "
-                        f"{report.get('incident_date', '')}"
-                    )
-
-                    st.write(
-                        f"**Amount Lost:** "
-                        f"₹{report.get('amount', 0)}"
-                    )
-
-                    st.write(
-                        "**Description:**"
-                    )
-
-                    st.info(
-                        report.get(
-                            "description",
-                            ""
-                        )
-                    )
-
-                    st.markdown("---")
-
-                    # ------------------------------------------------
-                    # STATUS
-                    # ------------------------------------------------
-
-                    status_options = [
-                        "Pending",
-                        "Under Review",
-                        "Guided",
-                        "Closed"
-                    ]
-
-                    current_status = report.get(
-                        "status",
-                        "Pending"
-                    )
-
-                    if current_status not in status_options:
-
-                        current_status = "Pending"
-
-                    status_index = (
-                        status_options.index(
-                            current_status
-                        )
-                    )
-
-                    new_status = st.selectbox(
-                        "📌 Report Status",
-                        status_options,
-                        index=status_index,
-                        key=f"status_{report['id']}"
-                    )
-
-                    # ------------------------------------------------
-                    # ADMIN RESPONSE
-                    # ------------------------------------------------
-
-                    admin_response = st.text_area(
-                        "✍️ Admin Guidance / Response",
-                        value=report.get(
-                            "admin_response",
-                            ""
-                        ) or "",
-                        placeholder=(
-                            "Example: Please contact 1930 "
-                            "and report the incident through "
-                            "the official cybercrime portal."
-                        ),
-                        key=f"response_{report['id']}"
-                    )
-
-                    # ------------------------------------------------
-                    # SAVE REVIEW
-                    # ------------------------------------------------
-
-                    if st.button(
-                        "💾 Save Review",
-                        key=f"save_review_{report['id']}"
-                    ):
-
-                        update_data = {
-                            "status":
-                                new_status,
-
-                            "admin_response":
-                                admin_response
-                        }
-
-                        if update_record(
-                            "scam_reports",
-                            "id",
-                            report["id"],
-                            update_data
-                        ):
-
-                            st.success(
-                                "Review and guidance "
-                                "saved successfully."
-                            )
-
-                            st.rerun()
-
-                    # ------------------------------------------------
-                    # OFFICIAL HELP
-                    # ------------------------------------------------
-
-                    st.markdown("---")
-
-                    st.warning(
-                        "For actual cyber fraud, the participant "
-                        "should contact 1930 and use the official "
-                        "National Cyber Crime Reporting Portal."
-                    )
-
-                    st.link_button(
-                        "🌐 Open Official Cyber Crime Portal",
-                        "https://www.cybercrime.gov.in/"
-                    )
-
 
 # ============================================================
-# REPORTS
+# BACK TO HOME
 # ============================================================
 
-elif page == "Reports":
+st.divider()
 
-    st.title(
-        "Reports and Records"
-    )
-
-    st.markdown(
-        "View consolidated records available in the system."
-    )
-
-    st.markdown(
-        '<div class="section-line"></div>',
-        unsafe_allow_html=True
-    )
-
-    tab1, tab2, tab3, tab4, tab5 = st.tabs([
-        "Participants",
-        "Smartphone Usage",
-        "Safety Events",
-        "Training",
-        "Scam Reports"
-    ])
-
-    with tab1:
-
-        if participants_df.empty:
-            st.info("No participant records found.")
-        else:
-            st.dataframe(
-                participants_df,
-                use_container_width=True,
-                hide_index=True
-            )
-
-    with tab2:
-
-        if usage_df.empty:
-            st.info("No smartphone usage records found.")
-        else:
-            st.dataframe(
-                usage_df,
-                use_container_width=True,
-                hide_index=True
-            )
-
-    with tab3:
-
-        if events_df.empty:
-            st.info("No safety event records found.")
-        else:
-            st.dataframe(
-                events_df,
-                use_container_width=True,
-                hide_index=True
-            )
-
-    with tab4:
-
-        if training_df.empty:
-            st.info("No training session records found.")
-        else:
-            st.dataframe(
-                training_df,
-                use_container_width=True,
-                hide_index=True
-            )
-
-    with tab5:
-
-        if scam_df.empty:
-            st.info("No scam reports found.")
-        else:
-            st.dataframe(
-                scam_df,
-                use_container_width=True,
-                hide_index=True
-            )
+if st.button("🏠 Back to Home"):
+    st.session_state.pop("topic", None)
+    st.rerun()
